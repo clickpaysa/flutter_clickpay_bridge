@@ -251,7 +251,7 @@ configuration.tokenFormat = PaymentSdkTokenFormat.Hex32Format
 
 Check our complete example here <https://github.com/clickpaysa/flutter_clickpay_bridge/tree/main/example>.
 
-<img src="https://user-images.githubusercontent.com/103630680/179504080-e7dee58c-a879-4aa8-b6f4-e2951be63d70.png" width="370">
+<img src="https://user-images.githubusercontent.com/103630680/179504080-e7dee58c-a879-4aa8-b6f4-e2951be63d70.png" />
 
 ## ClickPay
 
