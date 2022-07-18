@@ -204,7 +204,8 @@ Use the following guide to cusomize the colors, font, and logo by configuring th
 	configuration.iOSThemeConfigurations = theme;
 ```
 
-![UI guide](https://user-images.githubusercontent.com/13621658/109432213-d7981380-7a12-11eb-9224-c8fc12b0024d.jpg)
+![UI guide](https://user-images.githubusercontent.com/103630680/179504994-db672cd2-0e1a-4467-a5fa-cab9c5e80e97.png)
+
 
 ## Enums
 
@@ -248,20 +249,13 @@ configuration.tokenFormat = PaymentSdkTokenFormat.Hex32Format
 ```
 ## Demo application
 
-Check our complete example here <https://github.com/paytabscom/flutter-sdk-bridge/tree/master/example>.
+Check our complete example here <https://github.com/clickpaysa/flutter_clickpay_bridge/tree/main/example>.
 
-<img src="https://user-images.githubusercontent.com/95287975/160391259-97aaff10-cb9f-4103-bc3e-a938a1111128.png" width="370">
+<img src="https://user-images.githubusercontent.com/103630680/179504080-e7dee58c-a879-4aa8-b6f4-e2951be63d70.png" width="370">
 
-## License
+## ClickPay
 
-See [LICENSE][license].
+[Support][1]
 
-## Paytabs
-
-[Support][1] | [Terms of Use][2] | [Privacy Policy][3]
-
- [1]: https://www.paytabs.com/en/support/
- [2]: https://www.paytabs.com/en/terms-of-use/
- [3]: https://www.paytabs.com/en/privacy-policy/
- [license]: https://github.com/paytabscom/flutter-sdk-bridge/blob/pt2/LICENSE
- [applepayguide]: https://github.com/paytabscom/flutter-sdk-bridge/blob/pt2/ApplePayConfiguration.md
+ [1]: https://support.clickpay.com.sa/en/support/home
+ [applepayguide]: https://github.com/clickpaysa/flutter_clickpay_bridge/blob/main/ApplePayConfiguration.md
