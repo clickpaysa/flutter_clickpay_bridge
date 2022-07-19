@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_clickpay_bridge/flutter_clickpay_bridge.dart';
 
 void main() {
   const MethodChannel channel = MethodChannel('flutter_payment_sdk_bridge');
@@ -15,9 +14,5 @@ void main() {
 
   tearDown(() {
     channel.setMockMethodCallHandler(null);
-  });
-
-  test('getPlatformVersion', () async {
-    expect(await FlutterPaytabsBridge.platformVersion, '42');
   });
 }
