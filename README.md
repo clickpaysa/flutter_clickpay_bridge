@@ -12,7 +12,7 @@ Plugin Support:
 
 ```
 dependencies:
-   flutter_clickpay_bridge: ^2.1.3
+   flutter_clickpay_bridge: ^2.1.4
 ```
 
 ## Usage
