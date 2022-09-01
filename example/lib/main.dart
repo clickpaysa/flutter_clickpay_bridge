@@ -3,15 +3,10 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_clickpay_bridge/BaseBillingShippingInfo.dart';
-import 'package:flutter_clickpay_bridge/IOSThemeConfiguration.dart';
-import 'package:flutter_clickpay_bridge/PaymentSdkConfigurationDetails.dart';
-import 'package:flutter_clickpay_bridge/PaymentSdkLocale.dart';
-import 'package:flutter_clickpay_bridge/PaymentSdkTokenFormat.dart';
-import 'package:flutter_clickpay_bridge/PaymentSdkTokeniseType.dart';
-import 'package:flutter_clickpay_bridge/flutter_clickpay_bridge.dart';
-import 'package:flutter_clickpay_bridge/PaymentSdkTransactionClass.dart';
 import 'package:flutter_clickpay_bridge/PaymentSdkApms.dart';
+import 'package:flutter_clickpay_bridge/PaymentSdkConfigurationDetails.dart';
 import 'package:flutter_clickpay_bridge/PaymentSdkTransactionType.dart';
+import 'package:flutter_clickpay_bridge/flutter_clickpay_bridge.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,7 +25,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
-PaymentSdkConfigurationDetails generateConfig(){
+  PaymentSdkConfigurationDetails generateConfig() {
     var billingDetails = new BillingDetails(
         "Mohamed Adly",
         "m.adly@paytabs.com",
@@ -50,7 +45,7 @@ PaymentSdkConfigurationDetails generateConfig(){
         "dubai",
         "12345");
 
-    List<PaymentSdkAPms> apms= new List();
+    List<PaymentSdkAPms> apms = new List();
     apms.add(PaymentSdkAPms.KNET_DEBIT);
     apms.add(PaymentSdkAPms.KNET_CREDIT);
     var configuration = PaymentSdkConfigurationDetails(
@@ -65,7 +60,7 @@ PaymentSdkConfigurationDetails generateConfig(){
       shippingDetails: shippingDetails,
       amount: 20.0,
       currencyCode: "SAR",
-      alternativePaymentMethods:apms ,
+      alternativePaymentMethods: apms,
       transactionType: PaymentSdkTransactionType.AUTH,
       merchantCountryCode: "SA",
     );
@@ -75,9 +70,9 @@ PaymentSdkConfigurationDetails generateConfig(){
       // configuration.iOSThemeConfigurations = theme;
     }
     return configuration;
-}
-  Future<void> payPressed() async {
+  }
 
+  Future<void> payPressed() async {
     FlutterPaymentSdkBridge.startCardPayment(generateConfig(), (event) {
       setState(() {
         if (event["status"] == "success") {
@@ -92,8 +87,10 @@ PaymentSdkConfigurationDetails generateConfig(){
       });
     });
   }
- Future<void> apmsPayPressed() async {
-    FlutterPaymentSdkBridge.startAlternativePaymentMethod(generateConfig(), (event) {
+
+  Future<void> apmsPayPressed() async {
+    FlutterPaymentSdkBridge.startAlternativePaymentMethod(generateConfig(),
+        (event) {
       setState(() {
         if (event["status"] == "success") {
           // Handle transaction details here.
@@ -107,6 +104,7 @@ PaymentSdkConfigurationDetails generateConfig(){
       });
     });
   }
+
   Future<void> applePayPressed() async {
     var configuration = PaymentSdkConfigurationDetails(
         profileId: "*Your profile id*",
@@ -116,7 +114,6 @@ PaymentSdkConfigurationDetails generateConfig(){
         cartDescription: "Flowers",
         merchantName: "Flowers Store",
         amount: 20.0,
-   
         currencyCode: "AED",
         merchantCountryCode: "ae",
         merchantApplePayIndentifier: "merchant.com.bunldeId",
@@ -167,7 +164,7 @@ PaymentSdkConfigurationDetails generateConfig(){
                 },
                 child: Text('Pay with Card'),
               ),
-               SizedBox(height: 16),
+              SizedBox(height: 16),
               TextButton(
                 onPressed: () {
                   apmsPayPressed();
