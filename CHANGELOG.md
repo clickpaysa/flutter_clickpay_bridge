@@ -12,3 +12,6 @@
 
 ## 2.1.3
 * Update readme and pubspec
+
+## 2.1.4
+* Update ClickPaySDK
