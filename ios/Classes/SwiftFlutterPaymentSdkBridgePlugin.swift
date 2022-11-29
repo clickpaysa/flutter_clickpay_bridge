@@ -1,19 +1,21 @@
 import Flutter
 import UIKit
 import PaymentSDK
-
 let channelName = "flutter_payment_sdk_bridge"
 let streamChannelName = "flutter_payment_sdk_bridge_stream"
+
 
 public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
     var flutterEventSink: FlutterEventSink?
     var flutterListening = false
     var flutterResult: FlutterResult?
-
     enum CallMethods: String {
         case startCardPayment
         case startApplePayPayment
         case startApmsPayment
+        case startTokenizedCardPayment
+        case start3DSecureTokenizedCardPayment
+        case startPaymentWithSavedCards
     }
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: channelName, binaryMessenger: registrar.messenger())
@@ -22,7 +24,6 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         let stream = FlutterEventChannel(name: streamChannelName, binaryMessenger: registrar.messenger())
         stream.setStreamHandler(instance)
     }
-
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments: [String : Any] = call.arguments as? [String : Any] ?? [String : Any]()
         switch call.method {
@@ -32,11 +33,17 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
             startApplePayPayment(arguments: arguments)
         case CallMethods.startApmsPayment.rawValue:
             startAlternativePaymentMethod(arguments: arguments)
+        case CallMethods.startTokenizedCardPayment.rawValue:
+            startTokenizedCardPayment(arguments: arguments)
+            case CallMethods.startPaymentWithSavedCards.rawValue:
+            startPaymentWithSavedCards(arguments: arguments)
+            case CallMethods.start3DSecureTokenizedCardPayment.rawValue:
+            start3DSecureTokenizedCardPayment(arguments: arguments)
+
         default:
             break
         }
     }
-
     private func generateAlternativePaymentMethods(apmsArray: [String]) -> [AlternativePaymentMethod] {
         var apms = [AlternativePaymentMethod]()
         for apmValue in apmsArray {
@@ -46,13 +53,49 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         }
         return apms
     }
-
     private func startCarPayment(arguments: [String : Any]) {
         let configuration = generateConfiguration(dictionary: arguments)
         if let rootViewController = getRootController() {
             PaymentManager.startCardPayment(on: rootViewController, configuration: configuration, delegate: self)
         }
     }
+
+    private func startTokenizedCardPayment(arguments: [String : Any]) {
+        let configuration = generateConfiguration(dictionary: arguments)
+       guard let token = arguments["token"] as? String,
+        let transactionReference = arguments["transactionRef"] as? String else { return }
+        if let rootViewController = getRootController() {
+            PaymentManager.startTokenizedCardPayment(on: rootViewController, configuration: configuration, token: token, transactionRef: transactionReference, delegate: self)
+        }
+    }
+
+    private func startPaymentWithSavedCards(arguments: [String : Any]) {
+        let configuration = generateConfiguration(dictionary: arguments)
+        let support3DS = arguments["support3DS"] as? Bool ?? false
+        if let rootViewController = getRootController() {
+            PaymentManager.startPaymentWithSavedCards(on: rootViewController, configuration:configuration, support3DS: support3DS, delegate: self)
+        }
+    }
+
+     private func start3DSecureTokenizedCardPayment(arguments: [String : Any]) {
+        let configuration = generateConfiguration(dictionary: arguments)
+        guard  let token = arguments["token"] as? String,
+              let cardInfoDic = arguments["paymentSDKSavedCardInfo"] as? [String: Any],
+            let cardType = cardInfoDic["pt_card_type"] as? String,
+             let maskedCard = cardInfoDic["pt_masked_card"] as? String else { return }
+
+        let savedCardInfo = PaymentSDKSavedCardInfo(maskedCard: maskedCard, cardType: token)
+
+            if let rootViewController = getRootController() {
+            PaymentManager.start3DSecureTokenizedCardPayment(on: rootViewController,
+                                                                 configuration: configuration,
+                                                                 savedCardInfo: savedCardInfo,
+                                                                 token: token,
+                                                                 delegate: self)
+        }
+    }
+
+
     private func startAlternativePaymentMethod(arguments: [String : Any]) {
         let configuration = generateConfiguration(dictionary: arguments)
         if let rootViewController = getRootController() {
@@ -70,7 +113,6 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
             let topController = keyWindow?.rootViewController
             return topController
         }
-
     private func generateConfiguration(dictionary: [String: Any]) -> PaymentSDKConfiguration {
         let configuration = PaymentSDKConfiguration()
         configuration.profileID = dictionary[pt_profile_id] as? String ?? ""
@@ -93,13 +135,13 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         configuration.transactionReference = dictionary[pt_transaction_reference] as? String
         configuration.hideCardScanner = dictionary[pt_hide_card_scanner] as? Bool ?? false
         configuration.serverIP = dictionary[pt_server_ip] as? String
-
+        configuration.linkBillingNameWithCard = dictionary[pt_link_billing_name] as? Bool ?? true
         if let apmsString = dictionary[pt_apms] as? String {
             let alternativePaymentMethods = apmsString.components(separatedBy: ",")
             configuration.alternativePaymentMethods = generateAlternativePaymentMethods(apmsArray: alternativePaymentMethods)
 }
-        if let tokeniseType = dictionary[pt_tokenise_type] as? Int,
-           let type = TokeniseType.getType(type: tokeniseType) {
+        if let tokeniseType = dictionary[pt_tokenise_type] as? String,
+           let type = mapTokeniseType(tokeniseType: tokeniseType) {
             configuration.tokeniseType = type
         }
         if let tokenFormat = dictionary[pt_token_format] as? String,
@@ -124,8 +166,20 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         }
         return configuration
     }
-
-
+    private func mapTokeniseType(tokeniseType: String) -> TokeniseType? {
+           var type = 0
+           switch tokeniseType {
+           case "userOptional":
+               type = 3
+           case "userMandatory":
+               type = 2
+           case "merchantMandatory":
+               type = 1
+           default:
+               break
+           }
+           return TokeniseType.getType(type: type)
+       }
     private func generateBillingDetails(dictionary: [String: Any]) -> PaymentSDKBillingDetails? {
         let billingDetails = PaymentSDKBillingDetails()
         billingDetails.name = dictionary[pt_name_billing] as? String ?? ""
@@ -150,9 +204,7 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         shippingDetails.zip = dictionary[pt_zip_shipping] as? String ?? ""
         return shippingDetails
     }
-
     private func generateTheme(dictionary: [String: Any]) -> PaymentSDKTheme? {
-
         let theme = PaymentSDKTheme.default
         if let imageName = dictionary[pt_ios_logo] as? String {
             theme.logoImage = UIImage(named: imageName)
@@ -207,7 +259,6 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         }
         return theme
     }
-
     private func eventSink(code: Int, message: String, status: String, transactionDetails: [String: Any]? = nil) {
         var response = [String: Any]()
         response["code"] = code
@@ -221,23 +272,17 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         }
     }
 }
-
-
 extension SwiftFlutterPaymentSDKBridgePlugin: FlutterStreamHandler {
     public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         flutterEventSink = events
         flutterListening = true
         return nil
     }
-
     public func onCancel(withArguments arguments: Any?) -> FlutterError? {
         flutterListening = false;
         return nil
     }
-
 }
-
-
 extension SwiftFlutterPaymentSDKBridgePlugin: PaymentManagerDelegate {
     public func paymentManager(didFinishTransaction transactionDetails: PaymentSDKTransactionDetails?, error: Error?) {
         if flutterListening {
@@ -249,7 +294,13 @@ extension SwiftFlutterPaymentSDKBridgePlugin: PaymentManagerDelegate {
                 do {
                     let encoder = JSONEncoder()
                     let data = try encoder.encode(transactionDetails)
-                    let dictionary = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
+                    var dictionary = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
+                    dictionary?["isSuccess"] = transactionDetails?.isSuccess()
+                    dictionary?["isPending"] = transactionDetails?.isPending()
+                    dictionary?["isOnHold"] = transactionDetails?.isOnHold()
+                    dictionary?["isAuthorized"] = transactionDetails?.isAuthorized()
+                    dictionary?["isProcessed"] = transactionDetails?.isProcessed()
+
                     eventSink(code: 200,
                               message: "",
                               status: "success",
@@ -262,7 +313,6 @@ extension SwiftFlutterPaymentSDKBridgePlugin: PaymentManagerDelegate {
             }
         }
     }
-
     public func paymentManager(didCancelPayment error: Error?) {
         eventSink(code: 0, message: "Cancelled", status: "event")
     }

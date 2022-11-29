@@ -3,9 +3,11 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_clickpay_bridge/BaseBillingShippingInfo.dart';
+import 'package:flutter_clickpay_bridge/IOSThemeConfiguration.dart';
+import 'package:flutter_clickpay_bridge/PaymentSDKSavedCardInfo.dart';
 import 'package:flutter_clickpay_bridge/PaymentSdkApms.dart';
 import 'package:flutter_clickpay_bridge/PaymentSdkConfigurationDetails.dart';
-import 'package:flutter_clickpay_bridge/PaymentSdkTransactionType.dart';
+import 'package:flutter_clickpay_bridge/PaymentSdkTokeniseType.dart';
 import 'package:flutter_clickpay_bridge/flutter_clickpay_bridge.dart';
 
 void main() {
@@ -26,49 +28,34 @@ class _MyAppState extends State<MyApp> {
   }
 
   PaymentSdkConfigurationDetails generateConfig() {
-    var billingDetails = new BillingDetails(
-        "Mohamed Adly",
-        "m.adly@paytabs.com",
-        "+201111111111",
-        "st. 12",
-        "ae",
-        "dubai",
-        "dubai",
-        "12345");
-    var shippingDetails = new ShippingDetails(
-        "Mohamed Adly",
-        "email@example.com",
-        "+201111111111",
-        "st. 12",
-        "ae",
-        "dubai",
-        "dubai",
-        "12345");
-
-    List<PaymentSdkAPms> apms = new List();
+    var billingDetails = BillingDetails("John Smith", "email@domain.com",
+        "+97311111111", "st. 12", "eg", "dubai", "dubai", "12345");
+    var shippingDetails = ShippingDetails("John Smith", "email@domain.com",
+        "+97311111111", "st. 12", "eg", "dubai", "dubai", "12345");
+    List<PaymentSdkAPms> apms = [];
     apms.add(PaymentSdkAPms.KNET_DEBIT);
     apms.add(PaymentSdkAPms.KNET_CREDIT);
     var configuration = PaymentSdkConfigurationDetails(
-      profileId: "*Profile ID*",
-      serverKey: "Server key",
-      clientKey: "Client key",
-      cartId: "12433",
-      cartDescription: "Flowers",
-      merchantName: "Flowers Store",
-      screentTitle: "Pay with Card",
-      billingDetails: billingDetails,
-      shippingDetails: shippingDetails,
-      amount: 20.0,
-      currencyCode: "SAR",
-      alternativePaymentMethods: apms,
-      transactionType: PaymentSdkTransactionType.AUTH,
-      merchantCountryCode: "SA",
-    );
-    if (Platform.isIOS) {
-      // Set up here your custom theme
-      // var theme = IOSThemeConfigurations();
-      // configuration.iOSThemeConfigurations = theme;
-    }
+        profileId: "42349",
+        serverKey: "SLJNLK92TH-JGDLKLM9TR-KH62LRBK6J",
+        clientKey: "CQKMDV-MDTK6T-DBKBNP-2HHR79",
+        cartId: "12433",
+        cartDescription: "Flowers",
+        merchantName: "Flowers Store",
+        screentTitle: "Pay with Card",
+        amount: 20.0,
+        showBillingInfo: true,
+        forceShippingInfo: false,
+        currencyCode: "SAR",
+        merchantCountryCode: "SA",
+        billingDetails: billingDetails,
+        shippingDetails: shippingDetails,
+        alternativePaymentMethods: apms,
+        linkBillingNameWithCardHolderName: true);
+
+    var theme = IOSThemeConfigurations();
+    configuration.iOSThemeConfigurations = theme;
+    configuration.tokeniseType = PaymentSdkTokeniseType.MERCHANT_MANDATORY;
     return configuration;
   }
 
@@ -79,6 +66,99 @@ class _MyAppState extends State<MyApp> {
           // Handle transaction details here.
           var transactionDetails = event["data"];
           print(transactionDetails);
+          if (transactionDetails["isSuccess"]) {
+            print("successful transaction");
+            if (transactionDetails["isPending"]) {
+              print("transaction pending");
+            }
+          } else {
+            print("failed transaction");
+          }
+
+          // print(transactionDetails["isSuccess"]);
+        } else if (event["status"] == "error") {
+          // Handle error here.
+        } else if (event["status"] == "event") {
+          // Handle events here.
+        }
+      });
+    });
+  }
+
+  Future<void> payWithTokenPressed() async {
+    FlutterPaymentSdkBridge.startTokenizedCardPayment(
+        generateConfig(), "*Token*", "*TransactionReference*", (event) {
+      setState(() {
+        if (event["status"] == "success") {
+          // Handle transaction details here.
+          var transactionDetails = event["data"];
+          print(transactionDetails);
+          if (transactionDetails["isSuccess"]) {
+            print("successful transaction");
+            if (transactionDetails["isPending"]) {
+              print("transaction pending");
+            }
+          } else {
+            print("failed transaction");
+          }
+
+          // print(transactionDetails["isSuccess"]);
+        } else if (event["status"] == "error") {
+          // Handle error here.
+        } else if (event["status"] == "event") {
+          // Handle events here.
+        }
+      });
+    });
+  }
+
+  Future<void> payWith3ds() async {
+    FlutterPaymentSdkBridge.start3DSecureTokenizedCardPayment(
+        generateConfig(),
+        PaymentSDKSavedCardInfo("4111 11## #### 1111", "visa"),
+        "*Token*", (event) {
+      setState(() {
+        if (event["status"] == "success") {
+          // Handle transaction details here.
+          var transactionDetails = event["data"];
+          print(transactionDetails);
+          if (transactionDetails["isSuccess"]) {
+            print("successful transaction");
+            if (transactionDetails["isPending"]) {
+              print("transaction pending");
+            }
+          } else {
+            print("failed transaction");
+          }
+
+          // print(transactionDetails["isSuccess"]);
+        } else if (event["status"] == "error") {
+          // Handle error here.
+        } else if (event["status"] == "event") {
+          // Handle events here.
+        }
+      });
+    });
+  }
+
+  Future<void> payWithSavedCards() async {
+    FlutterPaymentSdkBridge.startPaymentWithSavedCards(generateConfig(), false,
+        (event) {
+      setState(() {
+        if (event["status"] == "success") {
+          // Handle transaction details here.
+          var transactionDetails = event["data"];
+          print(transactionDetails);
+          if (transactionDetails["isSuccess"]) {
+            print("successful transaction");
+            if (transactionDetails["isPending"]) {
+              print("transaction pending");
+            }
+          } else {
+            print("failed transaction");
+          }
+
+          // print(transactionDetails["isSuccess"]);
         } else if (event["status"] == "error") {
           // Handle error here.
         } else if (event["status"] == "event") {
@@ -89,8 +169,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> apmsPayPressed() async {
-    FlutterPaymentSdkBridge.startAlternativePaymentMethod(generateConfig(),
-        (event) {
+    FlutterPaymentSdkBridge.startAlternativePaymentMethod(
+        await generateConfig(), (event) {
       setState(() {
         if (event["status"] == "success") {
           // Handle transaction details here.
@@ -107,7 +187,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> applePayPressed() async {
     var configuration = PaymentSdkConfigurationDetails(
-        profileId: "*Your profile id*",
+        profileId: "*Profile id*",
         serverKey: "*server key*",
         clientKey: "*client key*",
         cartId: "12433",
@@ -163,6 +243,24 @@ class _MyAppState extends State<MyApp> {
                   payPressed();
                 },
                 child: Text('Pay with Card'),
+              ),
+              TextButton(
+                onPressed: () {
+                  payWithTokenPressed();
+                },
+                child: Text('Pay with Token'),
+              ),
+              TextButton(
+                onPressed: () {
+                  payWith3ds();
+                },
+                child: Text('Pay with 3ds'),
+              ),
+              TextButton(
+                onPressed: () {
+                  payWithSavedCards();
+                },
+                child: Text('Pay with saved cards'),
               ),
               SizedBox(height: 16),
               TextButton(
