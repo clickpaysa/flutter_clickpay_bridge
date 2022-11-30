@@ -258,6 +258,7 @@ FlutterPaymentSdkBridge.startAlternativePaymentMethod(generateConfig(), (event) 
 
 ```
 ## Theme
+### IOS
 Use the following guide to cusomize the colors, font, and logo by configuring the theme and pass it to the payment configuration.
 
 ```dart
@@ -268,6 +269,43 @@ Use the following guide to cusomize the colors, font, and logo by configuring th
 
 ![UI guide](https://user-images.githubusercontent.com/103630680/179504994-db672cd2-0e1a-4467-a5fa-cab9c5e80e97.png)
 
+### Android
+
+## Override strings
+
+To override string you can find the keys with the default values here
+![english]( https://github.com/paytabscom/paytabs-android-library-sample/blob/master/res/strings.xml)
+![arabic](https://github.com/paytabscom/paytabs-android-library-sample/blob/master/res/strings-ar.xml)
+
+## Override colors
+To override colors, make sure to you have colors.xml file inside Android resources or create one in the following path inside android folder: app/src/main/res/values/colors.xml
+
+````xml
+
+<resourse>
+    // to override colors
+    <color name="payment_sdk_primary_color">#5C13DF</color>
+    <color name="payment_sdk_secondary_color">#FFC107</color>
+    <color name="payment_sdk_primary_font_color">#111112</color>
+    <color name="payment_sdk_secondary_font_color">#6D6C70</color>
+    <color name="payment_sdk_separators_color">#FFC107</color>
+    <color name="payment_sdk_stroke_color">#673AB7</color>
+    <color name="payment_sdk_button_text_color">#FFF</color>
+    <color name="payment_sdk_title_text_color">#FFF</color>
+    <color name="payment_sdk_button_background_color">#3F51B5</color>
+    <color name="payment_sdk_background_color">#F9FAFD</color>
+    <color name="payment_sdk_card_background_color">#F9FAFD</color>
+
+    // to override dimens
+    <dimen name="payment_sdk_primary_font_size">17sp</dimen>
+    <dimen name="payment_sdk_secondary_font_size">15sp</dimen>
+    <dimen name="payment_sdk_separator_thickness">1dp</dimen>
+    <dimen name="payment_sdk_stroke_thickness">.5dp</dimen>
+    <dimen name="payment_sdk_input_corner_radius">8dp</dimen>
+    <dimen name="payment_sdk_button_corner_radius">8dp</dimen>
+
+</resourse>
+````
 
 ## Enums
 
