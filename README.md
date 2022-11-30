@@ -1,5 +1,5 @@
 # Flutter Clickpay Bridge
-![Version](https://img.shields.io/badge/flutter%20clickpay%20bridge-v2.1.4-green)
+![Version](https://img.shields.io/badge/flutter%20clickpay%20bridge-v2.2.0-green)
 
 Flutter ClickPay plugin is a wrapper for the native ClickPay Android and iOS SDKs, It helps you integrate with ClickPay payment gateway.
 
@@ -78,6 +78,68 @@ Options to show billing and shipping info
 ```dart
 
 FlutterPaymentSdkBridge.startCardPayment(configuration, (event) {
+      setState(() {
+        if (event["status"] == "success") {
+          // Handle transaction details here.
+          var transactionDetails = event["data"];
+          print(transactionDetails);
+        } else if (event["status"] == "error") {
+          // Handle error here.
+        } else if (event["status"] == "event") {
+          // Handle events here.
+        }
+      });
+    });
+     
+```
+### Pay with token secured 3ds
+Start payment by calling `start3DSecureTokenizedCardPayment` method and handle the transaction details
+
+```dart
+
+FlutterPaymentSdkBridge.start3DSecureTokenizedCardPayment(configuration,
+PaymentSDKSavedCardInfo("4111 11## #### 1111", "visa"),
+"Token", (event) {
+      setState(() {
+        if (event["status"] == "success") {
+          // Handle transaction details here.
+          var transactionDetails = event["data"];
+          print(transactionDetails);
+        } else if (event["status"] == "error") {
+          // Handle error here.
+        } else if (event["status"] == "event") {
+          // Handle events here.
+        }
+      });
+    });
+     
+```
+### Pay with token 
+Start payment by calling `startTokenizedCardPayment` method and handle the transaction details
+
+```dart
+
+FlutterPaymentSdkBridge.startTokenizedCardPayment(configuration, toke, transactionReference, (event) {
+      setState(() {
+        if (event["status"] == "success") {
+          // Handle transaction details here.
+          var transactionDetails = event["data"];
+          print(transactionDetails);
+        } else if (event["status"] == "error") {
+          // Handle error here.
+        } else if (event["status"] == "event") {
+          // Handle events here.
+        }
+      });
+    });
+     
+```
+### Pay with Saved Cards
+Start payment by calling `payWithSavedCards` method and handle the transaction details
+
+```dart
+
+FlutterPaymentSdkBridge.payWithSavedCards(configuration, enable3DSBoolean, (event) {
       setState(() {
         if (event["status"] == "success") {
           // Handle transaction details here.
