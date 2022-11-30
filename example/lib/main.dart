@@ -36,9 +36,9 @@ class _MyAppState extends State<MyApp> {
     apms.add(PaymentSdkAPms.KNET_DEBIT);
     apms.add(PaymentSdkAPms.KNET_CREDIT);
     var configuration = PaymentSdkConfigurationDetails(
-        profileId: "42349",
-        serverKey: "SLJNLK92TH-JGDLKLM9TR-KH62LRBK6J",
-        clientKey: "CQKMDV-MDTK6T-DBKBNP-2HHR79",
+        profileId: "ProfileId",
+        serverKey: "ServerKey",
+        clientKey: "ClientKey",
         cartId: "12433",
         cartDescription: "Flowers",
         merchantName: "Flowers Store",
