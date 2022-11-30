@@ -15,3 +15,6 @@
 
 ## 2.1.4
 * Update ClickPaySDK
+
+## 2.2.0
+* Add new payment methods( 3ds payment, savedCards payment)
