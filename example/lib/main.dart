@@ -4,6 +4,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_clickpay_bridge/BaseBillingShippingInfo.dart';
 import 'package:flutter_clickpay_bridge/IOSThemeConfiguration.dart';
+import 'package:flutter_clickpay_bridge/PaymentSDKQueryConfiguration.dart';
 import 'package:flutter_clickpay_bridge/PaymentSDKSavedCardInfo.dart';
 import 'package:flutter_clickpay_bridge/PaymentSdkApms.dart';
 import 'package:flutter_clickpay_bridge/PaymentSdkConfigurationDetails.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _instructions = 'Tap on "Pay" Button to try PayTabs plugin';
+  String _instructions = 'Tap on "Pay" Button to try Clickpay plugin';
 
   @override
   void initState() {
@@ -57,6 +58,22 @@ class _MyAppState extends State<MyApp> {
     configuration.iOSThemeConfigurations = theme;
     configuration.tokeniseType = PaymentSdkTokeniseType.MERCHANT_MANDATORY;
     return configuration;
+  }
+
+  Future<void> queryPressed() async {
+    FlutterPaymentSdkBridge.queryTransaction(generateQueryConfig(), (event) {
+      setState(() {
+        if (event["status"] == "success") {
+          // Handle transaction details here.
+          var transactionDetails = event["data"];
+          print(transactionDetails);
+        } else if (event["status"] == "error") {
+          // Handle error here.
+        } else if (event["status"] == "event") {
+          // Handle events here.
+        }
+      });
+    });
   }
 
   Future<void> payPressed() async {
@@ -230,7 +247,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('PayTabs Plugin Example App'),
+          title: const Text('Clickpay Plugin Example App'),
         ),
         body: Center(
             child: Column(
@@ -270,9 +287,21 @@ class _MyAppState extends State<MyApp> {
                 child: Text('Pay with Alternative payment methods'),
               ),
               SizedBox(height: 16),
+              TextButton(
+                onPressed: () {
+                  queryPressed();
+                },
+                child: Text('Query transaction'),
+              ),
+              SizedBox(height: 16),
               applePayButton()
             ])),
       ),
     );
+  }
+
+  PaymentSDKQueryConfiguration generateQueryConfig() {
+    return new PaymentSDKQueryConfiguration("STJNLJWLDL-JBJRGGBRBD-6NHBMHTKMM", "CKKMD9-HQVQ62-6RTT2R-GRMP2B",
+        "SA", "42007", "Transaction Reference");
   }
 }
