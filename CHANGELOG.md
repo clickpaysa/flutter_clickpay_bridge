@@ -18,3 +18,6 @@
 
 ## 2.2.0
 * Add new payment methods( 3ds payment, savedCards payment)
+
+## 2.3.0
+* Add Query feature

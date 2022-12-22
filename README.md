@@ -1,5 +1,5 @@
 # Flutter Clickpay Bridge
-![Version](https://img.shields.io/badge/flutter%20clickpay%20bridge-v2.2.0-green)
+![Version](https://img.shields.io/badge/flutter%20clickpay%20bridge-v2.3.0-green)
 
 Flutter ClickPay plugin is a wrapper for the native ClickPay Android and iOS SDKs, It helps you integrate with ClickPay payment gateway.
 
@@ -12,7 +12,7 @@ Plugin Support:
 
 ```
 dependencies:
-   flutter_clickpay_bridge: ^2.1.4
+   flutter_clickpay_bridge: ^2.3.0
 ```
 
 ## Usage
@@ -257,6 +257,41 @@ FlutterPaymentSdkBridge.startAlternativePaymentMethod(generateConfig(), (event) 
 }
 
 ```
+
+## Query transaction
+
+You can check the status of a transaction
+
+1- first create PaymentSDKQueryConfiguration
+```dart
+var queryConfig = PaymentSDKQueryConfiguration(
+    "ServerKey",
+    "ClientKey",
+    "Country Iso 2",
+    "Profile Id",
+    "Transaction Reference"
+);
+```
+
+2- Call QuerySdkActivity.queryTransaction and pass the needed arguments
+```dart
+FlutterPaytabsBridge.queryTransaction(
+    queryConfig,
+    (event) {
+        setState(() {
+            if (event["status"] == "success") {
+                // Handle transaction details here.
+                var transactionDetails = event["data"];
+                print(transactionDetails);
+            } else if (event["status"] == "error") {
+                // Handle error here.
+            } else if (event["status"] == "event") {
+                // Handle events here.
+            }
+        });
+    });
+```
+
 ## Theme
 ### IOS
 Use the following guide to cusomize the colors, font, and logo by configuring the theme and pass it to the payment configuration.
