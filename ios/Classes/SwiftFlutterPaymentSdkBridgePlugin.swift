@@ -16,6 +16,7 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         case startTokenizedCardPayment
         case start3DSecureTokenizedCardPayment
         case startPaymentWithSavedCards
+        case queryTransaction
     }
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: channelName, binaryMessenger: registrar.messenger())
@@ -35,11 +36,12 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
             startAlternativePaymentMethod(arguments: arguments)
         case CallMethods.startTokenizedCardPayment.rawValue:
             startTokenizedCardPayment(arguments: arguments)
-            case CallMethods.startPaymentWithSavedCards.rawValue:
+        case CallMethods.startPaymentWithSavedCards.rawValue:
             startPaymentWithSavedCards(arguments: arguments)
-            case CallMethods.start3DSecureTokenizedCardPayment.rawValue:
+        case CallMethods.start3DSecureTokenizedCardPayment.rawValue:
             start3DSecureTokenizedCardPayment(arguments: arguments)
-
+        case CallMethods.queryTransaction.rawValue:
+            queryTransaction(arguments: arguments)
         default:
             break
         }
@@ -92,6 +94,42 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
                                                                  savedCardInfo: savedCardInfo,
                                                                  token: token,
                                                                  delegate: self)
+        }
+    }
+
+    private func queryTransaction(arguments: [String : Any]) { 
+        let configuration = generateQueryConfiguration(dictionary: arguments)     
+        PaymentManager.queryTransaction(queryConfiguration: configuration) { [weak self] transactionDetails, error in
+        guard let self = self else { return }
+            if let _transactionDetails = transactionDetails {
+                 if self.flutterListening {
+                      do {
+                    let encoder = JSONEncoder()
+                    let data = try! encoder.encode(transactionDetails)
+                    var dictionary = try! JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
+                    dictionary?["isSuccess"] = transactionDetails?.isSuccess()
+                    dictionary?["isPending"] = transactionDetails?.isPending()
+                    dictionary?["isOnHold"] = transactionDetails?.isOnHold()
+                    dictionary?["isAuthorized"] = transactionDetails?.isAuthorized()
+                    dictionary?["isProcessed"] = transactionDetails?.isProcessed()
+
+
+                    self.eventSink(code: 200,
+                              message: "",
+                              status: "success",
+                              transactionDetails: dictionary)
+                } catch  {
+                    self.eventSink(code: (error as NSError).code,
+                              message: error.localizedDescription,
+                              status: "error")
+                }
+            }
+
+            } else if let _error = error {
+                self.eventSink(code: (_error as NSError).code,
+                          message: _error.localizedDescription,
+                          status: "error")
+            }
         }
     }
 
@@ -259,6 +297,17 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         }
         return theme
     }
+
+    private func generateQueryConfiguration(dictionary: [String: Any]) -> PaymentSDKQueryConfiguration {
+        let serverKey = dictionary[pt_server_key] as? String ?? ""
+        let clientKey = dictionary[pt_client_key] as? String ?? ""
+        let merchantCountryCode = dictionary[pt_merchant_country_code] as? String ?? ""
+        let profileID = dictionary[pt_profile_id] as? String ?? ""
+        let transactionReference = dictionary[pt_transaction_reference] as? String ?? ""
+        let configuration = PaymentSDKQueryConfiguration(serverKey: serverKey, clientKey: clientKey, merchantCountryCode: merchantCountryCode, profileID: profileID, transactionReference: transactionReference)
+        return configuration     
+    }
+    
     private func eventSink(code: Int, message: String, status: String, transactionDetails: [String: Any]? = nil) {
         var response = [String: Any]()
         response["code"] = code
