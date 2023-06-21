@@ -40,36 +40,40 @@ class PaymentSdkConfigurationDetails {
   PaymentSdkTransactionType? transactionType;
   IOSThemeConfigurations? iOSThemeConfigurations;
   List<PaymentSdkAPms>? alternativePaymentMethods;
+  bool? isDigitalProduct = false;
+  bool? enableZeroContacts = false;
   PaymentSdkConfigurationDetails(
       {this.profileId,
-      this.serverKey,
-      this.clientKey,
-      this.amount,
-      this.merchantCountryCode,
-      this.merchantName,
-      this.currencyCode,
-      this.token,
-      this.transactionReference,
-      this.tokenFormat,
-      this.tokeniseType,
-      this.screentTitle,
-      this.cartId,
-      this.cartDescription,
-      this.samsungPayToken,
-      this.showBillingInfo,
-      this.showShippingInfo,
-      this.forceShippingInfo,
-      this.billingDetails,
-      this.shippingDetails,
-      this.merchantApplePayIndentifier,
-      this.simplifyApplePayValidation,
-      this.hideCardScanner,
-      this.locale,
-      this.iOSThemeConfigurations,
-      this.transactionClass,
-      this.transactionType,
-      this.alternativePaymentMethods,
-      this.linkBillingNameWithCardHolderName});
+        this.serverKey,
+        this.clientKey,
+        this.amount,
+        this.merchantCountryCode,
+        this.merchantName,
+        this.currencyCode,
+        this.token,
+        this.transactionReference,
+        this.tokenFormat,
+        this.tokeniseType,
+        this.screentTitle,
+        this.cartId,
+        this.cartDescription,
+        this.samsungPayToken,
+        this.showBillingInfo,
+        this.showShippingInfo,
+        this.forceShippingInfo,
+        this.billingDetails,
+        this.shippingDetails,
+        this.merchantApplePayIndentifier,
+        this.simplifyApplePayValidation,
+        this.hideCardScanner,
+        this.locale,
+        this.iOSThemeConfigurations,
+        this.transactionClass,
+        this.transactionType,
+        this.alternativePaymentMethods,
+        this.linkBillingNameWithCardHolderName,
+        this.enableZeroContacts,
+        this.isDigitalProduct});
 
   String getApmsConcatenated(List<PaymentSdkAPms>? list) {
     if (list == null || list.isEmpty) return "";
@@ -85,7 +89,7 @@ class PaymentSdkConfigurationDetails {
 }
 
 extension PaymentSdkConfigurationDetailsExtension
-    on PaymentSdkConfigurationDetails {
+on PaymentSdkConfigurationDetails {
   Map<String, dynamic> get map {
     return {
       pt_profile_id: this.profileId,
@@ -116,8 +120,9 @@ extension PaymentSdkConfigurationDetailsExtension
       pt_transaction_class: this.transactionClass?.name,
       pt_transaction_type: this.transactionType?.name,
       pt_apms: getApmsConcatenated(this.alternativePaymentMethods),
-      pt_link_billing_name: this.linkBillingNameWithCardHolderName
+      pt_link_billing_name: this.linkBillingNameWithCardHolderName,
+      pt_enable_zero_contacts: this.enableZeroContacts,
+      pt_is_digital_product: this.isDigitalProduct
     };
   }
 }
-
