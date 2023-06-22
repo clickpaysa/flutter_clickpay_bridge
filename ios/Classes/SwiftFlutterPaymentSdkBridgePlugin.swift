@@ -42,6 +42,7 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
             start3DSecureTokenizedCardPayment(arguments: arguments)
         case CallMethods.queryTransaction.rawValue:
             queryTransaction(arguments: arguments)
+
         default:
             break
         }
@@ -82,9 +83,9 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
      private func start3DSecureTokenizedCardPayment(arguments: [String : Any]) {
         let configuration = generateConfiguration(dictionary: arguments)
         guard  let token = arguments["token"] as? String,
-              let cardInfoDic = arguments["paymentSDKSavedCardInfo"] as? [String: Any],
+            let cardInfoDic = arguments["paymentSDKSavedCardInfo"] as? [String: Any],
             let cardType = cardInfoDic["pt_card_type"] as? String,
-             let maskedCard = cardInfoDic["pt_masked_card"] as? String else { return }
+            let maskedCard = cardInfoDic["pt_masked_card"] as? String else { return }
 
         let savedCardInfo = PaymentSDKSavedCardInfo(maskedCard: maskedCard, cardType: token)
 
@@ -98,7 +99,8 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
     }
 
     private func queryTransaction(arguments: [String : Any]) { 
-        let configuration = generateQueryConfiguration(dictionary: arguments)     
+        guard let queryDictionary = arguments["paymentSDKQueryConfiguration"] as? [String: Any] else { return }
+        let configuration = generateQueryConfiguration(dictionary: queryDictionary)     
         PaymentManager.queryTransaction(queryConfiguration: configuration) { [weak self] transactionDetails, error in
         guard let self = self else { return }
             if let _transactionDetails = transactionDetails {
@@ -174,6 +176,9 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         configuration.hideCardScanner = dictionary[pt_hide_card_scanner] as? Bool ?? false
         configuration.serverIP = dictionary[pt_server_ip] as? String
         configuration.linkBillingNameWithCard = dictionary[pt_link_billing_name] as? Bool ?? true
+        configuration.isDigitalProduct = dictionary[pt_is_digital_product] as? Bool ?? false
+                configuration.enableZeroContacts = dictionary[pt_enable_zero_contacts] as? Bool ?? false
+
         if let apmsString = dictionary[pt_apms] as? String {
             let alternativePaymentMethods = apmsString.components(separatedBy: ",")
             configuration.alternativePaymentMethods = generateAlternativePaymentMethods(apmsArray: alternativePaymentMethods)
@@ -204,9 +209,21 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         }
         return configuration
     }
+
+    private func generateQueryConfiguration(dictionary: [String: Any]) -> PaymentSDKQueryConfiguration {
+        let serverKey = dictionary[pt_server_key] as? String ?? ""
+        let clientKey = dictionary[pt_client_key] as? String ?? ""
+        let merchantCountryCode = dictionary[pt_merchant_country_code] as? String ?? ""
+        let profileID = dictionary[pt_profile_id] as? String ?? ""
+        let transactionReference = dictionary[pt_transaction_reference] as? String ?? ""
+        let configuration = PaymentSDKQueryConfiguration(serverKey: serverKey, clientKey: clientKey, merchantCountryCode: merchantCountryCode, profileID: profileID, transactionReference: transactionReference)
+        return configuration     
+    }
     private func mapTokeniseType(tokeniseType: String) -> TokeniseType? {
            var type = 0
            switch tokeniseType {
+           case "userOptinoalDefaultOn":
+               type = 3
            case "userOptional":
                type = 3
            case "userMandatory":
@@ -297,22 +314,14 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         }
         return theme
     }
-
-    private func generateQueryConfiguration(dictionary: [String: Any]) -> PaymentSDKQueryConfiguration {
-        let serverKey = dictionary[pt_server_key] as? String ?? ""
-        let clientKey = dictionary[pt_client_key] as? String ?? ""
-        let merchantCountryCode = dictionary[pt_merchant_country_code] as? String ?? ""
-        let profileID = dictionary[pt_profile_id] as? String ?? ""
-        let transactionReference = dictionary[pt_transaction_reference] as? String ?? ""
-        let configuration = PaymentSDKQueryConfiguration(serverKey: serverKey, clientKey: clientKey, merchantCountryCode: merchantCountryCode, profileID: profileID, transactionReference: transactionReference)
-        return configuration     
-    }
-    
-    private func eventSink(code: Int, message: String, status: String, transactionDetails: [String: Any]? = nil) {
+    private func eventSink(code: Int, message: String, status: String, transactionDetails: [String: Any]? = nil, trace: String? = nil) {
         var response = [String: Any]()
         response["code"] = code
         response["message"] = message
         response["status"] = status
+        if let _trace = trace {
+        response["trace"] = trace
+        }
         if let transactionDetails = transactionDetails {
             response["data"] = transactionDetails
         }
@@ -336,9 +345,11 @@ extension SwiftFlutterPaymentSDKBridgePlugin: PaymentManagerDelegate {
     public func paymentManager(didFinishTransaction transactionDetails: PaymentSDKTransactionDetails?, error: Error?) {
         if flutterListening {
             if let error = error {
+                let trace = (error as? LocalizedError)?.failureReason
                 eventSink(code: (error as NSError).code,
                           message: error.localizedDescription,
-                          status: "error")
+                          status: "error",
+                            trace: trace)
             } else {
                 do {
                     let encoder = JSONEncoder()
@@ -362,6 +373,7 @@ extension SwiftFlutterPaymentSDKBridgePlugin: PaymentManagerDelegate {
             }
         }
     }
+
     public func paymentManager(didCancelPayment error: Error?) {
         eventSink(code: 0, message: "Cancelled", status: "event")
     }
