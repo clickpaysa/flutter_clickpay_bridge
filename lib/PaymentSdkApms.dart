@@ -1,6 +1,15 @@
 enum PaymentSdkAPms {
-  UNION_PAY, STC_PAY, VALU, MEEZA_QR,
-    OMAN_NET, KNET_CREDIT, FAWRY, KNET_DEBIT
+  UNION_PAY,
+  STC_PAY,
+  VALU,
+  MEEZA_QR,
+  OMAN_NET,
+  KNET_CREDIT,
+  FAWRY,
+  KNET_DEBIT,
+  GOOGLE_PAY,
+  SAMSUNG_PAY,
+  APPLE_PAY
 }
 
 extension PaymentSdkTokenFormatExtension on PaymentSdkAPms {
@@ -22,6 +31,12 @@ extension PaymentSdkTokenFormatExtension on PaymentSdkAPms {
         return 'fawry';
       case PaymentSdkAPms.KNET_DEBIT:
         return 'knetdebit';
+      case PaymentSdkAPms.GOOGLE_PAY:
+        return 'googlepay';
+      case PaymentSdkAPms.SAMSUNG_PAY:
+        return 'samsungpay';
+      case PaymentSdkAPms.APPLE_PAY:
+        return 'applePay';
       default:
         return null;
     }

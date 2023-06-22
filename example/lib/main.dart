@@ -35,7 +35,7 @@ class _MyAppState extends State<MyApp> {
         "+97311111111", "st. 12", "eg", "dubai", "dubai", "12345");
     List<PaymentSdkAPms> apms = [];
     apms.add(PaymentSdkAPms.KNET_DEBIT);
-    apms.add(PaymentSdkAPms.KNET_CREDIT);
+    apms.add(PaymentSdkAPms.APPLE_PAY);
     var configuration = PaymentSdkConfigurationDetails(
         profileId: "ProfileId",
         serverKey: "ServerKey",
