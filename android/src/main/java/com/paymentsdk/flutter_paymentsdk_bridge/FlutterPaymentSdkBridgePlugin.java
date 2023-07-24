@@ -210,17 +210,6 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
         }
     }
 
-    @NotNull
-    private PaymentSDKQueryConfiguration getQueryConfigurations(JSONObject paymentDetails) throws JSONException {
-        String clientKey = paymentDetails.optString("pt_client_key");
-        String serverKey = paymentDetails.optString("pt_server_key");
-        String merchantCountryCode = paymentDetails.optString("pt_merchant_country_code");
-        String profileId = paymentDetails.optString("pt_profile_id");
-        String transactionReference = paymentDetails.optString("pt_transaction_reference");
-        PaymentSDKQueryConfiguration info = new PaymentSDKQueryConfiguration(
-                serverKey, clientKey, merchantCountryCode, profileId, transactionReference);
-        return info;
-    }
 
     @NotNull
     private CallbackQueryInterface getQueryCallback() {
@@ -228,9 +217,9 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
             @Override
             public void onError(@NotNull PaymentSdkError err) {
                 if (err.getCode() != null)
-                    returnResponseToFlutter(err.getCode(), err.getMsg(), "error", null);
+                    returnResponseToFlutter(err.getCode(), err.getMsg(), "error", null,null);
                 else
-                    returnResponseToFlutter(0, err.getMsg(), "error", null);
+                    returnResponseToFlutter(0, err.getMsg(), "error", null, null);
 
             }
 
@@ -241,7 +230,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
 
             @Override
             public void onCancel() {
-                returnResponseToFlutter(0, "Cancelled", "event", null);
+                returnResponseToFlutter(0, "Cancelled", "event", null, null);
             }
         };
     }
@@ -285,30 +274,6 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
         };
     }
 
-    @NotNull
-    private CallbackQueryInterface getQueryCallback() {
-        return new CallbackQueryInterface() {
-            @Override
-            public void onError(@NotNull PaymentSdkError err) {
-                if (err.getCode() != null)
-                    returnResponseToFlutter(err.getCode(), err.getMsg(), "error",  err.getTrace(),null);
-                else
-                    returnResponseToFlutter(0, err.getMsg(), "error",  err.getTrace(),null);
-
-            }
-
-            @Override
-            public void onResult(@NotNull TransactionResponseBody paymentSdkTransactionDetails) {
-                returnQueryResultToFlutter(200, "success", "success", paymentSdkTransactionDetails);
-            }
-
-            @Override
-            public void onCancel() {
-                returnResponseToFlutter(0, "Cancelled", "event", null, null);
-            }
-        };
-    }
-
     private void returnResponseToFlutter(int code, String msg, String status, String trace, PaymentSdkTransactionDetails data) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         if (data != null) {
@@ -323,23 +288,6 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
         map.put("message", msg);
         map.put("status", status);
         map.put("trace", trace);
-        eventSink.success(map);
-    }
-
-
-    private void returnQueryResultToFlutter(int code, String msg, String status, TransactionResponseBody data) {
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        if (data != null) {
-            String detailsString = new Gson().toJson(data);
-            Map<String, Object> detailsMap = new Gson().fromJson(
-                    detailsString, new TypeToken<HashMap<String, Object>>() {
-                    }.getType()
-            );
-            map.put("data", detailsMap);
-        }
-        map.put("code", code);
-        map.put("message", msg);
-        map.put("status", status);
         eventSink.success(map);
     }
 

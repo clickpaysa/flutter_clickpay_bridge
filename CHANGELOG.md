@@ -21,7 +21,11 @@
 
 ## 2.3.0
 * Add Query feature
+
 ## 2.3.1
 * Add SamsungPay and GooglePay
 * Add new TokenizationType
 * Add isDigital option
+
+## 2.3.2
+* Fix build fail issue
