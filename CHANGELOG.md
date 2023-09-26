@@ -29,3 +29,6 @@
 
 ## 2.3.2
 * Fix build fail issue
+
+## 2.4.0
+* Fixing bugs

@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
 import 'PaymentSDKQueryConfiguration.dart';
@@ -93,7 +91,7 @@ class FlutterPaymentSdkBridge {
     arg.samsungPayToken = null;
     MethodChannel localChannel = MethodChannel('flutter_payment_sdk_bridge');
     EventChannel localStream =
-    const EventChannel('flutter_payment_sdk_bridge_stream');
+        const EventChannel('flutter_payment_sdk_bridge_stream');
     localStream.receiveBroadcastStream().listen(eventsCallBack);
     var logoImage = arg.iOSThemeConfigurations?.logoImage ?? "";
     if (logoImage != "") {
@@ -110,7 +108,7 @@ class FlutterPaymentSdkBridge {
     arg.samsungPayToken = null;
     MethodChannel localChannel = MethodChannel('flutter_payment_sdk_bridge');
     EventChannel localStream =
-    const EventChannel('flutter_payment_sdk_bridge_stream');
+        const EventChannel('flutter_payment_sdk_bridge_stream');
     localStream.receiveBroadcastStream().listen(eventsCallBack);
     var logoImage = arg.iOSThemeConfigurations?.logoImage ?? "";
     if (logoImage != "") {
@@ -131,7 +129,7 @@ class FlutterPaymentSdkBridge {
     arg.samsungPayToken = null;
     MethodChannel localChannel = MethodChannel('flutter_payment_sdk_bridge');
     EventChannel localStream =
-    const EventChannel('flutter_payment_sdk_bridge_stream');
+        const EventChannel('flutter_payment_sdk_bridge_stream');
     localStream.receiveBroadcastStream().listen(eventsCallBack);
     var logoImage = arg.iOSThemeConfigurations?.logoImage ?? "";
     if (logoImage != "") {
@@ -151,7 +149,7 @@ class FlutterPaymentSdkBridge {
     arg.samsungPayToken = null;
     MethodChannel localChannel = MethodChannel('flutter_payment_sdk_bridge');
     EventChannel localStream =
-    const EventChannel('flutter_payment_sdk_bridge_stream');
+        const EventChannel('flutter_payment_sdk_bridge_stream');
     localStream.receiveBroadcastStream().listen(eventsCallBack);
     var logoImage = arg.iOSThemeConfigurations?.logoImage ?? "";
     if (logoImage != "") {
@@ -168,7 +166,7 @@ class FlutterPaymentSdkBridge {
       void eventsCallBack(dynamic)) async {
     MethodChannel localChannel = MethodChannel('flutter_payment_sdk_bridge');
     EventChannel localStream =
-    const EventChannel('flutter_payment_sdk_bridge_stream');
+        const EventChannel('flutter_payment_sdk_bridge_stream');
     localStream.receiveBroadcastStream().listen(eventsCallBack);
     return await localChannel.invokeMethod(
         'queryTransaction', paymentSDKQueryConfiguration.map);
@@ -194,7 +192,7 @@ class FlutterPaymentSdkBridge {
     arg.samsungPayToken = null;
     MethodChannel localChannel = MethodChannel('flutter_payment_sdk_bridge');
     EventChannel localStream =
-    const EventChannel('flutter_payment_sdk_bridge_stream');
+        const EventChannel('flutter_payment_sdk_bridge_stream');
     localStream.receiveBroadcastStream().listen(eventsCallBack);
     return await localChannel.invokeMethod('startApmsPayment', arg.map);
   }
@@ -203,7 +201,7 @@ class FlutterPaymentSdkBridge {
       PaymentSdkConfigurationDetails arg, void eventsCallBack(dynamic)) async {
     MethodChannel localChannel = MethodChannel('flutter_payment_sdk_bridge');
     EventChannel localStream =
-    const EventChannel('flutter_payment_sdk_bridge_stream');
+        const EventChannel('flutter_payment_sdk_bridge_stream');
     localStream.receiveBroadcastStream().listen(eventsCallBack);
     return await localChannel.invokeMethod('startSamsungPayPayment', arg.map);
   }
@@ -215,7 +213,7 @@ class FlutterPaymentSdkBridge {
     }
     MethodChannel localChannel = MethodChannel('flutter_payment_sdk_bridge');
     EventChannel localStream =
-    const EventChannel('flutter_payment_sdk_bridge_stream');
+        const EventChannel('flutter_payment_sdk_bridge_stream');
     localStream.receiveBroadcastStream().listen(eventsCallBack);
     return await localChannel.invokeMethod('startApplePayPayment', arg.map);
   }
