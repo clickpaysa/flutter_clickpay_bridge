@@ -32,3 +32,6 @@
 
 ## 2.4.0
 * Fixing bugs
+
+## 2.4.1
+* Fixing bugs
