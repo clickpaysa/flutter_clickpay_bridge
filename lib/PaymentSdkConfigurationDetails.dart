@@ -8,6 +8,7 @@ import 'PaymentSdkLocale.dart';
 import 'PaymentSdkTokenFormat.dart';
 import 'PaymentSdkTokeniseType.dart';
 import 'flutter_clickpay_bridge.dart';
+import 'PaymentSDKNetworks.dart';
 
 class PaymentSdkConfigurationDetails {
   BillingDetails? billingDetails;
@@ -41,6 +42,8 @@ class PaymentSdkConfigurationDetails {
   List<PaymentSdkAPms>? alternativePaymentMethods;
   bool? isDigitalProduct = false;
   bool? enableZeroContacts = false;
+  List<PaymentSDKNetworks>? paymentNetworks;
+
   PaymentSdkConfigurationDetails(
       {this.profileId,
         this.serverKey,
@@ -72,7 +75,8 @@ class PaymentSdkConfigurationDetails {
         this.alternativePaymentMethods,
         this.linkBillingNameWithCardHolderName,
         this.enableZeroContacts,
-        this.isDigitalProduct});
+        this.isDigitalProduct,
+      this.paymentNetworks});
 
   String getApmsConcatenated(List<PaymentSdkAPms>? list) {
     if (list == null || list.isEmpty) return "";
@@ -85,6 +89,18 @@ class PaymentSdkConfigurationDetails {
     }
     return apmsStr;
   }
+}
+
+String getPaymentNetworksConcatenated(List<PaymentSDKNetworks>? list) {
+  if (list == null || list.isEmpty) return "";
+  String networkStr = "";
+  for (var apm in list) {
+    if (networkStr != "") {
+      networkStr += ",";
+    }
+    networkStr += "${apm.name}";
+  }
+  return networkStr;
 }
 
 extension PaymentSdkConfigurationDetailsExtension
@@ -121,7 +137,8 @@ on PaymentSdkConfigurationDetails {
       pt_apms: getApmsConcatenated(this.alternativePaymentMethods),
       pt_link_billing_name: this.linkBillingNameWithCardHolderName,
       pt_enable_zero_contacts: this.enableZeroContacts,
-      pt_is_digital_product: this.isDigitalProduct
+      pt_is_digital_product: this.isDigitalProduct,
+      pt_payment_networks: getPaymentNetworksConcatenated(this.paymentNetworks)
     };
   }
 }

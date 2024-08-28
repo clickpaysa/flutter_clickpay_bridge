@@ -84,6 +84,7 @@ const String pt_card_type = "pt_card_type";
 // Billing new logic
 const String pt_enable_zero_contacts = "pt_enable_zero_contacts";
 const String pt_is_digital_product = "pt_is_digital_product";
+const String pt_payment_networks = "pt_payment_networks";
 
 class FlutterPaymentSdkBridge {
   static Future<dynamic> startCardPayment(

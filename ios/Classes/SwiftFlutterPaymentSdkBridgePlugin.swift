@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 import PaymentSDK
+import PassKit
 let channelName = "flutter_payment_sdk_bridge"
 let streamChannelName = "flutter_payment_sdk_bridge_stream"
 
@@ -56,6 +57,16 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         }
         return apms
     }
+     private func generatePaymentNetworks(paymentsArray: [String]) -> [PKPaymentNetwork] {
+                var networks = [PKPaymentNetwork]()
+                for paymentNetwork in paymentsArray {
+                    if let network = PKPaymentNetwork.fromString(paymentNetwork) {
+                        networks.append(network)
+                    }
+                }
+
+                return networks
+            }
     private func startCarPayment(arguments: [String : Any]) {
         let configuration = generateConfiguration(dictionary: arguments)
         if let rootViewController = getRootController() {
@@ -207,6 +218,11 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         if let shippingDictionary = dictionary[pt_shipping_details] as?  [String: Any] {
             configuration.shippingDetails = generateShippingDetails(dictionary: shippingDictionary)
         }
+          if let paymentNetworksStr = dictionary[pt_payment_networks] as? String,
+                    !paymentNetworksStr.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                     let paymentNetworks = paymentNetworksStr.components(separatedBy: ",")
+                     configuration.paymentNetworks = generatePaymentNetworks(paymentsArray: paymentNetworks)
+                 }
         return configuration
     }
 

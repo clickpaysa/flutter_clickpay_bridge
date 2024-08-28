@@ -76,3 +76,5 @@ let pt_ios_title_font = "pt_ios_title_font"
 let pt_ios_logo = "pt_ios_logo"
 let pt_transaction_type = "pt_transaction_type"
 let pt_apms = "pt_apms"
+let pt_payment_networks = "pt_payment_networks"
+
