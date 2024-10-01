@@ -46,6 +46,7 @@ android {
     lint {
         disable 'InvalidPackage'
     }
+    namespace 'com.paytabs.flutter_payment_sdk_bridge_example'
 }
 
 flutter {

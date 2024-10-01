@@ -37,6 +37,7 @@ android {
             exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
         }
     }
+    namespace 'com.paytabs.flutter_payment_sdk_bridge_example'
 }
 
 dependencies {
