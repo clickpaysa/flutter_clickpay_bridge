@@ -28,9 +28,9 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   ClickPay: b567219f0820fab053c09ae7e42ce0aae4176327
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_clickpay_bridge: 44916eeb772b4cd25a00c8b7a4a4769985ce8bdb
-  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
+  flutter_clickpay_bridge: 5ef297eb5349f7cbf57ce67e5f3c42b065aad74a
+  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
 
 PODFILE CHECKSUM: 45e816557ec991b6bbc9b6809ca0cf4fc73f8e18
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
