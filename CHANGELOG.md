@@ -41,3 +41,6 @@
 
 ## 2.4.3
 * Fixing bugs
+
+## 2.4.4
+* Migrate to Kotlin DSL for Gradle build configuration and update dependencies
