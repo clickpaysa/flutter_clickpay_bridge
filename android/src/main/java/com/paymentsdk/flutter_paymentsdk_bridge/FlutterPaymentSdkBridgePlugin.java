@@ -1,5 +1,12 @@
 package com.paymentsdk.flutter_paymentsdk_bridge;
 
+import static com.payment.paymentsdk.integrationmodels.PaymentSdkApmsKt.createPaymentSdkApms;
+import static com.payment.paymentsdk.integrationmodels.PaymentSdkLanguageCodeKt.createPaymentSdkLanguageCode;
+import static com.payment.paymentsdk.integrationmodels.PaymentSdkTokenFormatKt.createPaymentSdkTokenFormat;
+import static com.payment.paymentsdk.integrationmodels.PaymentSdkTokeniseKt.createPaymentSdkTokenise;
+import static com.payment.paymentsdk.integrationmodels.PaymentSdkTransactionClassKt.createPaymentSdkTransactionClass;
+import static com.payment.paymentsdk.integrationmodels.PaymentSdkTransactionTypeKt.createPaymentSdkTransactionType;
+
 import android.app.Activity;
 import android.content.Context;
 
@@ -9,7 +16,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.payment.paymentsdk.PaymentSdkActivity;
 import com.payment.paymentsdk.PaymentSdkConfigBuilder;
-import com.payment.paymentsdk.save_cards.entities.PaymentSDKSavedCardInfo;
+import com.payment.paymentsdk.QuerySdkActivity;
+import com.payment.paymentsdk.integrationmodels.PaymentSDKQueryConfiguration;
 import com.payment.paymentsdk.integrationmodels.PaymentSdkApms;
 import com.payment.paymentsdk.integrationmodels.PaymentSdkBillingDetails;
 import com.payment.paymentsdk.integrationmodels.PaymentSdkConfigurationDetails;
@@ -20,19 +28,15 @@ import com.payment.paymentsdk.integrationmodels.PaymentSdkTokenFormat;
 import com.payment.paymentsdk.integrationmodels.PaymentSdkTokenise;
 import com.payment.paymentsdk.integrationmodels.PaymentSdkTransactionDetails;
 import com.payment.paymentsdk.integrationmodels.PaymentSdkTransactionType;
+import com.payment.paymentsdk.save_cards.entities.PaymentSDKSavedCardInfo;
 import com.payment.paymentsdk.sharedclasses.interfaces.CallbackPaymentInterface;
-import com.payment.paymentsdk.sharedclasses.model.response.TransactionResponseBody;
-import com.payment.paymentsdk.integrationmodels.PaymentSDKQueryConfiguration;
-import com.payment.paymentsdk.QuerySdkActivity;
 import com.payment.paymentsdk.sharedclasses.interfaces.CallbackQueryInterface;
+import com.payment.paymentsdk.sharedclasses.model.response.TransactionResponseBody;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Document;
 
-import java.io.File;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,16 +49,6 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
-
-import static com.payment.paymentsdk.integrationmodels.PaymentSdkApmsKt.createPaymentSdkApms;
-import static com.payment.paymentsdk.integrationmodels.PaymentSdkLanguageCodeKt.createPaymentSdkLanguageCode;
-import static com.payment.paymentsdk.integrationmodels.PaymentSdkTokenFormatKt.createPaymentSdkTokenFormat;
-import static com.payment.paymentsdk.integrationmodels.PaymentSdkTokeniseKt.createPaymentSdkTokenise;
-import static com.payment.paymentsdk.integrationmodels.PaymentSdkTransactionClassKt.createPaymentSdkTransactionClass;
-import static com.payment.paymentsdk.integrationmodels.PaymentSdkTransactionTypeKt.createPaymentSdkTransactionType;
-
-import javax.xml.parsers.DocumentBuilder;
 
 /**
  * FlutterPaymentSdkBridgePlugin
@@ -92,20 +86,6 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
         );
     }
 
-    // This static function is optional and equivalent to onAttachedToEngine. It supports the old
-    // pre-Flutter-1.12 Android projects. You are encouraged to continue supporting
-    // plugin registration via this function while apps migrate to use the new Android APIs
-    // post-flutter-1.12 via https://flutter.dev/go/android-project-migration.
-    //
-    // It is encouraged to share logic between onAttachedToEngine and registerWith to keep
-    // them functionally equivalent. Only one of onAttachedToEngine or registerWith will be called
-    // depending on the user's project. onAttachedToEngine or registerWith must both be defined
-    // in the same class.
-    public static void registerWith(Registrar registrar) {
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), "flutter_payment_sdk_bridge_emulator");
-        channel.setMethodCallHandler(new FlutterPaymentSdkBridgePlugin());
-    }
-
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         if (call.method.equals("startCardPayment")) {
@@ -120,7 +100,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
             makeSamsungPayment(call);
         } else if (call.method.equals("startApmsPayment")) {
             makeApmsPayment(call);
-        }else if (call.method.equals("queryTransaction")) {
+        } else if (call.method.equals("queryTransaction")) {
             queryTransaction(call);
         }
     }
@@ -217,7 +197,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
             @Override
             public void onError(@NotNull PaymentSdkError err) {
                 if (err.getCode() != null)
-                    returnResponseToFlutter(err.getCode(), err.getMsg(), "error", null,null);
+                    returnResponseToFlutter(err.getCode(), err.getMsg(), "error", null, null);
                 else
                     returnResponseToFlutter(0, err.getMsg(), "error", null, null);
 
@@ -234,6 +214,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
             }
         };
     }
+
     private void returnQueryResultToFlutter(int code, String msg, String status, TransactionResponseBody data) {
         HashMap<String, Object> map = new HashMap<String, Object>();
         if (data != null) {
@@ -256,9 +237,9 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
             @Override
             public void onError(@NotNull PaymentSdkError err) {
                 if (err.getCode() != null)
-                    returnResponseToFlutter(err.getCode(), err.getMsg(), "error", err.getTrace(),null);
+                    returnResponseToFlutter(err.getCode(), err.getMsg(), "error", err.getTrace(), null);
                 else
-                    returnResponseToFlutter(0, err.getMsg(), "error", err.getTrace(),null);
+                    returnResponseToFlutter(0, err.getMsg(), "error", err.getTrace(), null);
 
             }
 
@@ -269,7 +250,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
 
             @Override
             public void onPaymentCancel() {
-                returnResponseToFlutter(0, "Cancelled", "event", null,null);
+                returnResponseToFlutter(0, "Cancelled", "event", null, null);
             }
         };
     }
@@ -406,6 +387,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
 
                 .build();
     }
+
     public static String optString(JSONObject json, String key) {
         if (json.isNull(key))
             return "";
