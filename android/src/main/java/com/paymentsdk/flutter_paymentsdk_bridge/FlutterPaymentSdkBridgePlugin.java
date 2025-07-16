@@ -8,7 +8,6 @@ import static com.payment.paymentsdk.integrationmodels.PaymentSdkTransactionClas
 import static com.payment.paymentsdk.integrationmodels.PaymentSdkTransactionTypeKt.createPaymentSdkTransactionType;
 
 import android.app.Activity;
-import android.content.Context;
 
 import androidx.annotation.NonNull;
 
@@ -59,14 +58,12 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
     private MethodChannel channel;
-    private Context context;
     private Activity activity;
     private EventChannel.EventSink eventSink;
     static final String streamName = "flutter_payment_sdk_bridge_stream";
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-        context = flutterPluginBinding.getApplicationContext();
         channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "flutter_payment_sdk_bridge");
         channel.setMethodCallHandler(this);
         EventChannel eventChannel = new EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor().getBinaryMessenger(), streamName);
@@ -74,13 +71,11 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
                 new EventChannel.StreamHandler() {
                     @Override
                     public void onListen(Object args, final EventChannel.EventSink events) {
-//                Log.w(TAG, "adding listener");
                         eventSink = events;
                     }
 
                     @Override
                     public void onCancel(Object args) {
-//                Log.w(TAG, "cancelling listener");
                     }
                 }
         );
