@@ -19,8 +19,6 @@ extension PaymentSdkTokeniseTypeExtension on PaymentSdkTokeniseType {
         return "merchantMandatory";
       case PaymentSdkTokeniseType.USER_OPTIONAL_DEFAULT_ON:
         return "userOptionalDefaultOn";
-      default:
-        return "none";
     }
   }
 }

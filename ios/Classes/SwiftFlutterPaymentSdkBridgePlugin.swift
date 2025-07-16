@@ -16,7 +16,6 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         case startApmsPayment
         case startTokenizedCardPayment
         case start3DSecureTokenizedCardPayment
-        case startPaymentWithSavedCards
         case queryTransaction
     }
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -37,8 +36,6 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
             startAlternativePaymentMethod(arguments: arguments)
         case CallMethods.startTokenizedCardPayment.rawValue:
             startTokenizedCardPayment(arguments: arguments)
-        case CallMethods.startPaymentWithSavedCards.rawValue:
-            startPaymentWithSavedCards(arguments: arguments)
         case CallMethods.start3DSecureTokenizedCardPayment.rawValue:
             start3DSecureTokenizedCardPayment(arguments: arguments)
         case CallMethods.queryTransaction.rawValue:
@@ -80,14 +77,6 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         let transactionReference = arguments["transactionRef"] as? String else { return }
         if let rootViewController = getRootController() {
             PaymentManager.startTokenizedCardPayment(on: rootViewController, configuration: configuration, token: token, transactionRef: transactionReference, delegate: self)
-        }
-    }
-
-    private func startPaymentWithSavedCards(arguments: [String : Any]) {
-        let configuration = generateConfiguration(dictionary: arguments)
-        let support3DS = arguments["support3DS"] as? Bool ?? false
-        if let rootViewController = getRootController() {
-            PaymentManager.startPaymentWithSavedCards(on: rootViewController, configuration:configuration, support3DS: support3DS, delegate: self)
         }
     }
 
@@ -205,7 +194,6 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         if let transactionType = dictionary[pt_transaction_type] as? String {
          configuration.transactionType = TransactionType.init(rawValue: transactionType) ?? .sale
          }
-//        public var paymentNetworks: [PKPaymentNetwork]?
         if let themeDictionary = dictionary[pt_ios_theme] as? [String: Any],
            let theme = generateTheme(dictionary: themeDictionary) {
             configuration.theme = theme
@@ -218,11 +206,12 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
         if let shippingDictionary = dictionary[pt_shipping_details] as?  [String: Any] {
             configuration.shippingDetails = generateShippingDetails(dictionary: shippingDictionary)
         }
-          if let paymentNetworksStr = dictionary[pt_payment_networks] as? String,
+        if let paymentNetworksStr = dictionary[pt_payment_networks] as? String,
                     !paymentNetworksStr.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                      let paymentNetworks = paymentNetworksStr.components(separatedBy: ",")
                      configuration.paymentNetworks = generatePaymentNetworks(paymentsArray: paymentNetworks)
                  }
+        configuration.metaData = ["PaymentSDKPluginName": "flutter", "PaymentSDKPluginVersion": "2.4.4"]
         return configuration
     }
 

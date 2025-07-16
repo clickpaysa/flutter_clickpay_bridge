@@ -91,8 +91,6 @@ extension PaymentSDKNetworksExtension on PaymentSDKNetworks {
         return "tmoney";
       case PaymentSDKNetworks.meeza:
         return "meeza";
-      default:
-        return "unknown";
     }
   }
 }

@@ -5,7 +5,7 @@ version '1.0'
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
@@ -16,7 +16,7 @@ buildscript {
 rootProject.allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
@@ -36,9 +36,9 @@ android {
             exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
         }
     }
-    namespace 'com.paytabs.flutter_payment_sdk_bridge_example'
+    namespace 'com.clickpay.flutter_payment_sdk_bridge_example'
 }
 
 dependencies {
-    implementation 'sa.com.clickpay:payment-sdk:6.6.5'
+    implementation 'sa.com.clickpay:payment-sdk:6.7.1'
 }

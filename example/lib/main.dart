@@ -29,14 +29,14 @@ class _MyAppState extends State<MyApp> {
   }
 
   PaymentSdkConfigurationDetails generateConfig() {
-    var billingDetails = BillingDetails("John Smith", "email@domain.com",
+    final billingDetails = BillingDetails("John Smith", "email@domain.com",
         "+97311111111", "st. 12", "eg", "dubai", "dubai", "12345");
-    var shippingDetails = ShippingDetails("John Smith", "email@domain.com",
+    final shippingDetails = ShippingDetails("John Smith", "email@domain.com",
         "+97311111111", "st. 12", "eg", "dubai", "dubai", "12345");
     List<PaymentSdkAPms> apms = [];
     apms.add(PaymentSdkAPms.KNET_DEBIT);
     apms.add(PaymentSdkAPms.APPLE_PAY);
-    var configuration = PaymentSdkConfigurationDetails(
+    final configuration = PaymentSdkConfigurationDetails(
         profileId: "ProfileId",
         serverKey: "ServerKey",
         clientKey: "ClientKey",
@@ -158,33 +158,6 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future<void> payWithSavedCards() async {
-    FlutterPaymentSdkBridge.startPaymentWithSavedCards(generateConfig(), false,
-        (event) {
-      setState(() {
-        if (event["status"] == "success") {
-          // Handle transaction details here.
-          var transactionDetails = event["data"];
-          print(transactionDetails);
-          if (transactionDetails["isSuccess"]) {
-            print("successful transaction");
-            if (transactionDetails["isPending"]) {
-              print("transaction pending");
-            }
-          } else {
-            print("failed transaction");
-          }
-
-          // print(transactionDetails["isSuccess"]);
-        } else if (event["status"] == "error") {
-          // Handle error here.
-        } else if (event["status"] == "event") {
-          // Handle events here.
-        }
-      });
-    });
-  }
-
   Future<void> apmsPayPressed() async {
     FlutterPaymentSdkBridge.startAlternativePaymentMethod(
         await generateConfig(), (event) {
@@ -273,12 +246,6 @@ class _MyAppState extends State<MyApp> {
                 },
                 child: Text('Pay with 3ds'),
               ),
-              TextButton(
-                onPressed: () {
-                  payWithSavedCards();
-                },
-                child: Text('Pay with saved cards'),
-              ),
               SizedBox(height: 16),
               TextButton(
                 onPressed: () {
@@ -301,11 +268,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   PaymentSDKQueryConfiguration generateQueryConfig() {
-    return new PaymentSDKQueryConfiguration(
-        "ServerKey",
-        "ClientKey",
-        "Country Iso 2",
-        "Profile Id",
-        "Transaction Reference");
+    return new PaymentSDKQueryConfiguration("ServerKey", "ClientKey",
+        "Country Iso 2", "Profile Id", "Transaction Reference");
   }
 }

@@ -1,8 +1,4 @@
-enum PaymentSdkLocale {
-  AR,
-  EN,
-  DEFAULT,
-}
+enum PaymentSdkLocale { AR, EN, DEFAULT }
 
 extension PaymentSdkLocaleExtension on PaymentSdkLocale {
   String get name {
@@ -12,8 +8,6 @@ extension PaymentSdkLocaleExtension on PaymentSdkLocale {
       case PaymentSdkLocale.EN:
         return "en";
       case PaymentSdkLocale.DEFAULT:
-        return "default";
-      default:
         return "default";
     }
   }

@@ -6,9 +6,8 @@ plugins {
 }
 
 android {
-    namespace = "com.paytabs.flutter_payment_sdk_bridge_example"
+    namespace = "com.clickpay.flutter_payment_sdk_bridge_example"
     compileSdk = 35
-    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -20,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.paytabs.flutter_payment_sdk_bridge_example"
+        applicationId = "com.clickpay.flutter_payment_sdk_bridge_example"
         minSdk = 21
         targetSdk = 35
         versionCode = flutter.versionCode

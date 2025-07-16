@@ -67,18 +67,22 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
         channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "flutter_payment_sdk_bridge");
         channel.setMethodCallHandler(this);
         EventChannel eventChannel = new EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor().getBinaryMessenger(), streamName);
-        eventChannel.setStreamHandler(
-                new EventChannel.StreamHandler() {
-                    @Override
-                    public void onListen(Object args, final EventChannel.EventSink events) {
-                        eventSink = events;
-                    }
+        eventChannel.setStreamHandler(new EventChannel.StreamHandler() {
+            @Override
+            public void onListen(Object args, final EventChannel.EventSink events) {
+                eventSink = events;
+            }
 
-                    @Override
-                    public void onCancel(Object args) {
-                    }
-                }
-        );
+            @Override
+            public void onCancel(Object args) {
+            }
+        });
+    }
+    private Map<String, Object> getMetadata() {
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("PaymentSDKPluginName", "flutter");
+        metadata.put("PaymentSDKPluginVersion", "2.4.4");
+        return metadata;
     }
 
     @Override
@@ -89,8 +93,6 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
             makeTokenizedCardPayment(call);
         } else if (call.method.equals("start3DSecureTokenizedCardPayment")) {
             make3DSecureTokenizedCardPayment(call);
-        } else if (call.method.equals("startPaymentWithSavedCards")) {
-            makePaymentWithSavedCards(call);
         } else if (call.method.equals("startSamsungPayPayment")) {
             makeSamsungPayment(call);
         } else if (call.method.equals("startApmsPayment")) {
@@ -114,11 +116,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
         try {
             HashMap<String, Object> arguments = call.arguments();
             JSONObject paymentDetails = new JSONObject(arguments);
-            PaymentSdkActivity.startTokenizedCardPayment(activity,
-                    getPaymentSdkConfigurationDetails(paymentDetails),
-                    getToken(paymentDetails),
-                    getTransactionRef(paymentDetails),
-                    getCallback());
+            PaymentSdkActivity.startTokenizedCardPayment(activity, getPaymentSdkConfigurationDetails(paymentDetails), getToken(paymentDetails), getTransactionRef(paymentDetails), getCallback());
         } catch (Exception e) {
             eventSink.error("0", e.getMessage(), "{}");
         }
@@ -128,24 +126,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
         try {
             HashMap<String, Object> arguments = call.arguments();
             JSONObject paymentDetails = new JSONObject(arguments);
-            PaymentSdkActivity.start3DSecureTokenizedCardPayment(activity,
-                    getPaymentSdkConfigurationDetails(paymentDetails),
-                    getSavedCardInfo(paymentDetails.optJSONObject("paymentSDKSavedCardInfo")),
-                    getToken(paymentDetails),
-                    getCallback());
-        } catch (Exception e) {
-            eventSink.error("0", e.getMessage(), "{}");
-        }
-    }
-
-    private void makePaymentWithSavedCards(@NonNull MethodCall call) {
-        try {
-            HashMap<String, Object> arguments = call.arguments();
-            JSONObject paymentDetails = new JSONObject(arguments);
-            PaymentSdkActivity.startPaymentWithSavedCards(activity,
-                    getPaymentSdkConfigurationDetails(paymentDetails),
-                    getIsSupport3DS(paymentDetails),
-                    getCallback());
+            PaymentSdkActivity.start3DSecureTokenizedCardPayment(activity, getPaymentSdkConfigurationDetails(paymentDetails), getSavedCardInfo(paymentDetails.optJSONObject("paymentSDKSavedCardInfo")), getToken(paymentDetails), getCallback());
         } catch (Exception e) {
             eventSink.error("0", e.getMessage(), "{}");
         }
@@ -177,9 +158,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
         try {
             HashMap<String, Object> arguments = call.arguments();
             JSONObject paymentDetails = new JSONObject(arguments);
-            QuerySdkActivity.queryTransaction(activity,
-                    getQueryConfigurations(paymentDetails),
-                    getQueryCallback());
+            QuerySdkActivity.queryTransaction(activity, getQueryConfigurations(paymentDetails), getQueryCallback());
         } catch (Exception e) {
             eventSink.error("0", e.getMessage(), "{}");
         }
@@ -193,8 +172,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
             public void onError(@NotNull PaymentSdkError err) {
                 if (err.getCode() != null)
                     returnResponseToFlutter(err.getCode(), err.getMsg(), "error", null, null);
-                else
-                    returnResponseToFlutter(0, err.getMsg(), "error", null, null);
+                else returnResponseToFlutter(0, err.getMsg(), "error", null, null);
 
             }
 
@@ -214,10 +192,8 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
         HashMap<String, Object> map = new HashMap<String, Object>();
         if (data != null) {
             String detailsString = new Gson().toJson(data);
-            Map<String, Object> detailsMap = new Gson().fromJson(
-                    detailsString, new TypeToken<HashMap<String, Object>>() {
-                    }.getType()
-            );
+            Map<String, Object> detailsMap = new Gson().fromJson(detailsString, new TypeToken<HashMap<String, Object>>() {
+            }.getType());
             map.put("data", detailsMap);
         }
         map.put("code", code);
@@ -233,8 +209,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
             public void onError(@NotNull PaymentSdkError err) {
                 if (err.getCode() != null)
                     returnResponseToFlutter(err.getCode(), err.getMsg(), "error", err.getTrace(), null);
-                else
-                    returnResponseToFlutter(0, err.getMsg(), "error", err.getTrace(), null);
+                else returnResponseToFlutter(0, err.getMsg(), "error", err.getTrace(), null);
 
             }
 
@@ -254,10 +229,8 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
         HashMap<String, Object> map = new HashMap<String, Object>();
         if (data != null) {
             String detailsString = new Gson().toJson(data);
-            Map<String, Object> detailsMap = new Gson().fromJson(
-                    detailsString, new TypeToken<HashMap<String, Object>>() {
-                    }.getType()
-            );
+            Map<String, Object> detailsMap = new Gson().fromJson(detailsString, new TypeToken<HashMap<String, Object>>() {
+            }.getType());
             map.put("data", detailsMap);
         }
         map.put("code", code);
@@ -269,28 +242,19 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
 
     @NotNull
     private String getToken(JSONObject paymentDetails) throws JSONException {
-        String token = paymentDetails.optString("token");
-        return token;
+        return paymentDetails.optString("token");
     }
 
     @NotNull
-    private Boolean getIsSupport3DS(JSONObject paymentDetails) throws JSONException {
-        Boolean support3DS = paymentDetails.optBoolean("support3DS");
-        return support3DS;
-    }
-
-    @NotNull
-    private String getTransactionRef(JSONObject paymentDetails) throws JSONException {
-        String trxRef = paymentDetails.optString("transactionRef");
-        return trxRef;
+    private String getTransactionRef(JSONObject paymentDetails) {
+        return paymentDetails.optString("transactionRef");
     }
 
     @NotNull
     private PaymentSDKSavedCardInfo getSavedCardInfo(JSONObject paymentDetails) throws JSONException {
         String maskedCard = paymentDetails.optString("pt_masked_card");
         String cardType = paymentDetails.optString("pt_card_type");
-        PaymentSDKSavedCardInfo info = new PaymentSDKSavedCardInfo(maskedCard, cardType);
-        return info;
+        return new PaymentSDKSavedCardInfo(maskedCard, cardType);
     }
 
     @NotNull
@@ -300,9 +264,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
         String merchantCountryCode = paymentDetails.optString("pt_merchant_country_code");
         String profileId = paymentDetails.optString("pt_profile_id");
         String transactionReference = paymentDetails.optString("pt_transaction_reference");
-        PaymentSDKQueryConfiguration info = new PaymentSDKQueryConfiguration(
-                serverKey, clientKey, merchantCountryCode, profileId, transactionReference);
-        return info;
+        return new PaymentSDKQueryConfiguration(serverKey, clientKey, merchantCountryCode, profileId, transactionReference);
     }
 
     @NotNull
@@ -334,60 +296,27 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
 
         PaymentSdkBillingDetails billingData = null;
         if (billingDetails != null) {
-            billingData = new PaymentSdkBillingDetails(
-                    billingDetails.optString("pt_city_billing"),
-                    billingDetails.optString("pt_country_billing"),
-                    billingDetails.optString("pt_email_billing"),
-                    billingDetails.optString("pt_name_billing"),
-                    billingDetails.optString("pt_phone_billing"), billingDetails.optString("pt_state_billing"),
-                    billingDetails.optString("pt_address_billing"), billingDetails.optString("pt_zip_billing")
-            );
+            billingData = new PaymentSdkBillingDetails(billingDetails.optString("pt_city_billing"), billingDetails.optString("pt_country_billing"), billingDetails.optString("pt_email_billing"), billingDetails.optString("pt_name_billing"), billingDetails.optString("pt_phone_billing"), billingDetails.optString("pt_state_billing"), billingDetails.optString("pt_address_billing"), billingDetails.optString("pt_zip_billing"));
         }
         JSONObject shippingDetails = paymentDetails.optJSONObject("pt_shipping_details");
         PaymentSdkShippingDetails shippingData = null;
         if (shippingDetails != null) {
-            shippingData = new PaymentSdkShippingDetails(
-                    shippingDetails.optString("pt_city_shipping"),
-                    shippingDetails.optString("pt_country_shipping"),
-                    shippingDetails.optString("pt_email_shipping"),
-                    shippingDetails.optString("pt_name_shipping"),
-                    shippingDetails.optString("pt_phone_shipping"), shippingDetails.optString("pt_state_shipping"),
-                    shippingDetails.optString("pt_address_shipping"), shippingDetails.optString("pt_zip_shipping")
-            );
+            shippingData = new PaymentSdkShippingDetails(shippingDetails.optString("pt_city_shipping"), shippingDetails.optString("pt_country_shipping"), shippingDetails.optString("pt_email_shipping"), shippingDetails.optString("pt_name_shipping"), shippingDetails.optString("pt_phone_shipping"), shippingDetails.optString("pt_state_shipping"), shippingDetails.optString("pt_address_shipping"), shippingDetails.optString("pt_zip_shipping"));
         }
-        return new PaymentSdkConfigBuilder(
-                profileId, serverKey, clientKey, amount, currency)
-                .setCartDescription(cartDesc)
-                .setLanguageCode(locale)
-                .setBillingData(billingData)
-                .setMerchantCountryCode(paymentDetails.optString("pt_merchant_country_code"))
-                .setShippingData(shippingData)
-                .setCartId(orderId)
-                .setTransactionClass(createPaymentSdkTransactionClass(paymentDetails.optString("pt_transaction_class")))
-                .setTransactionType(transaction_type)
-                .setTokenise(tokeniseType, tokenFormat)
-                .setTokenisationData(token, transRef)
-                .setAlternativePaymentMethods(aPmsList)
-                .showBillingInfo(paymentDetails.optBoolean("pt_show_billing_info"))
-                .showShippingInfo(paymentDetails.optBoolean("pt_show_shipping_info"))
-                .forceShippingInfo(paymentDetails.optBoolean("pt_force_validate_shipping"))
-                .setMerchantIcon(iconUri)
-                .setScreenTitle(screenTitle)
-                .linkBillingNameWithCard(paymentDetails.optBoolean("pt_link_billing_name"))
-                .hideCardScanner(paymentDetails.optBoolean("pt_hide_card_scanner"))
+        return new PaymentSdkConfigBuilder(profileId, serverKey, clientKey, amount, currency)
+                .setCartDescription(cartDesc).setLanguageCode(locale)
+                .setBillingData(billingData).setMerchantCountryCode(paymentDetails.optString("pt_merchant_country_code")).setShippingData(shippingData).setCartId(orderId).setTransactionClass(createPaymentSdkTransactionClass(paymentDetails.optString("pt_transaction_class"))).setTransactionType(transaction_type).setTokenise(tokeniseType, tokenFormat).setTokenisationData(token, transRef).setAlternativePaymentMethods(aPmsList).showBillingInfo(paymentDetails.optBoolean("pt_show_billing_info")).showShippingInfo(paymentDetails.optBoolean("pt_show_shipping_info")).forceShippingInfo(paymentDetails.optBoolean("pt_force_validate_shipping")).setMerchantIcon(iconUri).setScreenTitle(screenTitle).linkBillingNameWithCard(paymentDetails.optBoolean("pt_link_billing_name")).hideCardScanner(paymentDetails.optBoolean("pt_hide_card_scanner"))
                 //New stuff
                 .enableZeroContacts(paymentDetails.optBoolean("pt_enable_zero_contacts"))
                 .isDigitalProduct(paymentDetails.optBoolean("pt_is_digital_product"))
-
+                .setMetadata(getMetadata())
 
                 .build();
     }
 
     public static String optString(JSONObject json, String key) {
-        if (json.isNull(key))
-            return "";
-        else
-            return json.optString(key, null);
+        if (json.isNull(key)) return "";
+        else return json.optString(key, null);
     }
 
     private ArrayList<PaymentSdkApms> getAPmsList(String pt_apms) {
@@ -399,8 +328,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
         for (String split : splits) {
             if (split.length() > 0) {
                 PaymentSdkApms apms = createPaymentSdkApms(split);
-                if (apms != null)
-                    apmsArrayList.add(apms);
+                if (apms != null) apmsArrayList.add(apms);
             }
         }
         return apmsArrayList;
@@ -418,18 +346,14 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-
     }
 
     @Override
     public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-
     }
 
     @Override
     public void onDetachedFromActivity() {
-
     }
-
 
 }

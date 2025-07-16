@@ -22,8 +22,6 @@ extension PaymentSdkTokenFormatExtension on PaymentSdkTokenFormat {
         return '5';
       case PaymentSdkTokenFormat.AlphaNum32Format:
         return '6';
-      default:
-        return null;
     }
   }
 }

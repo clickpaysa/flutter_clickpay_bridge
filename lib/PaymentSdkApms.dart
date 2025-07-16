@@ -9,7 +9,7 @@ enum PaymentSdkAPms {
   KNET_DEBIT,
   GOOGLE_PAY,
   SAMSUNG_PAY,
-  APPLE_PAY
+  APPLE_PAY,
 }
 
 extension PaymentSdkTokenFormatExtension on PaymentSdkAPms {
@@ -37,8 +37,6 @@ extension PaymentSdkTokenFormatExtension on PaymentSdkAPms {
         return 'samsungpay';
       case PaymentSdkAPms.APPLE_PAY:
         return 'applePay';
-      default:
-        return null;
     }
   }
 }

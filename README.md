@@ -134,26 +134,7 @@ FlutterPaymentSdkBridge.startTokenizedCardPayment(configuration, toke, transacti
     });
      
 ```
-### Pay with Saved Cards
-Start payment by calling `payWithSavedCards` method and handle the transaction details
 
-```dart
-
-FlutterPaymentSdkBridge.payWithSavedCards(configuration, enable3DSBoolean, (event) {
-      setState(() {
-        if (event["status"] == "success") {
-          // Handle transaction details here.
-          var transactionDetails = event["data"];
-          print(transactionDetails);
-        } else if (event["status"] == "error") {
-          // Handle error here.
-        } else if (event["status"] == "event") {
-          // Handle events here.
-        }
-      });
-    });
-     
-```
 ### Tokenization
 To enable tokenisation please follow the below instructions.
 ```dart

@@ -143,25 +143,6 @@ class FlutterPaymentSdkBridge {
         'start3DSecureTokenizedCardPayment', argsMap);
   }
 
-  static Future<dynamic> startPaymentWithSavedCards(
-      PaymentSdkConfigurationDetails arg,
-      bool support3DS,
-      void eventsCallBack(dynamic)) async {
-    arg.samsungPayToken = null;
-    MethodChannel localChannel = MethodChannel('flutter_payment_sdk_bridge');
-    EventChannel localStream =
-        const EventChannel('flutter_payment_sdk_bridge_stream');
-    localStream.receiveBroadcastStream().listen(eventsCallBack);
-    var logoImage = arg.iOSThemeConfigurations?.logoImage ?? "";
-    if (logoImage != "") {
-      arg.iOSThemeConfigurations?.logoImage = await handleImagePath(logoImage);
-    }
-    var argsMap = arg.map;
-    argsMap["support3DS"] = support3DS;
-    return await localChannel.invokeMethod(
-        'startPaymentWithSavedCards', argsMap);
-  }
-
   static Future<dynamic> queryTransaction(
       PaymentSDKQueryConfiguration paymentSDKQueryConfiguration,
       void eventsCallBack(dynamic)) async {
