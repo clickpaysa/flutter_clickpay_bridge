@@ -6,3 +6,5 @@
 
 build/
 android/.idea/
+.idea/
+**/Flutter/ephemeral/
