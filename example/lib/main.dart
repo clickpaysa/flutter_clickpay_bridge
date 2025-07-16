@@ -227,40 +227,26 @@ class _MyAppState extends State<MyApp> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
               Text('$_instructions'),
-              SizedBox(height: 16),
               TextButton(
-                onPressed: () {
-                  payPressed();
-                },
+                onPressed: () => payPressed(),
                 child: Text('Pay with Card'),
               ),
               TextButton(
-                onPressed: () {
-                  payWithTokenPressed();
-                },
+                onPressed: () => payWithTokenPressed(),
                 child: Text('Pay with Token'),
               ),
               TextButton(
-                onPressed: () {
-                  payWith3ds();
-                },
+                onPressed: () => payWith3ds(),
                 child: Text('Pay with 3ds'),
               ),
-              SizedBox(height: 16),
               TextButton(
-                onPressed: () {
-                  apmsPayPressed();
-                },
+                onPressed: () => apmsPayPressed(),
                 child: Text('Pay with Alternative payment methods'),
               ),
-              SizedBox(height: 16),
               TextButton(
-                onPressed: () {
-                  queryPressed();
-                },
+                onPressed: () => queryPressed(),
                 child: Text('Query transaction'),
               ),
-              SizedBox(height: 16),
               applePayButton()
             ])),
       ),
