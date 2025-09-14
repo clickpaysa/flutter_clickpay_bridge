@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.4'
+        classpath 'com.android.tools.build:gradle:8.13.0'
     }
 }
 
@@ -23,22 +23,19 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdk 34
+    compileSdkVersion 36
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 23
     }
     lintOptions {
         disable 'InvalidPackage'
-    }
-    configurations.all {
-        resolutionStrategy {
-            exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
-        }
     }
     namespace 'com.clickpay.flutter_payment_sdk_bridge_example'
 }
 
 dependencies {
-    implementation 'sa.com.clickpay:payment-sdk:6.7.1'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'sa.com.clickpay:payment-sdk:6.8.1'
+    implementation 'com.google.code.gson:gson:2.13.1'
 }

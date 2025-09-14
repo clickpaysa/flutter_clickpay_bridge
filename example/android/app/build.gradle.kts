@@ -7,11 +7,11 @@ plugins {
 
 android {
     namespace = "com.clickpay.flutter_payment_sdk_bridge_example"
-    compileSdk = 35
+    compileSdk = 36
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
@@ -20,8 +20,8 @@ android {
 
     defaultConfig {
         applicationId = "com.clickpay.flutter_payment_sdk_bridge_example"
-        minSdk = 21
-        targetSdk = 35
+        minSdk = 23
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
