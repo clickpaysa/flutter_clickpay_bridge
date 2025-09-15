@@ -44,3 +44,6 @@
 
 ## 2.4.4
 * Migrate to Kotlin DSL for Gradle build configuration and update dependencies
+
+## 2.4.5
+* support android 16K
