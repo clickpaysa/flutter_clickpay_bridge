@@ -64,12 +64,35 @@ public class SwiftFlutterPaymentSDKBridgePlugin: NSObject, FlutterPlugin {
 
                 return networks
             }
+
+            
+    // ----------- UPDATED PART -------------
     private func startCarPayment(arguments: [String : Any]) {
-        let configuration = generateConfiguration(dictionary: arguments)
-        if let rootViewController = getRootController() {
-            PaymentManager.startCardPayment(on: rootViewController, configuration: configuration, delegate: self)
+    let configuration = generateConfiguration(dictionary: arguments)
+
+    if let rootViewController = getRootController() {
+
+        PaymentManager.startCardPayment(on: rootViewController, configuration: configuration, delegate: self)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+
+            if let presentedVC = rootViewController.presentedViewController {
+                self.updateTextFields(view: presentedVC.view)
+            }
         }
     }
+}
+    private func updateTextFields(view: UIView) {
+        for subview in view.subviews {
+
+            if let textField = subview as? UITextField {
+                textField.backgroundColor = .clear
+            }
+
+            updateTextFields(view: subview)
+        }
+    }
+    // ----------- END OF UPDATED PART -------------
 
     private func startTokenizedCardPayment(arguments: [String : Any]) {
         let configuration = generateConfiguration(dictionary: arguments)
