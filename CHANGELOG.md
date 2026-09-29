@@ -47,3 +47,7 @@
 
 ## 2.4.5
 * support android 16K
+
+## 2.4.6
+* Android: bump ClickPay payment-sdk to 6.8.2
+* Fix QuerySdkActivity NullPointerException crash when query config is missing (native SDK)
