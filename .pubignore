@@ -1,0 +1,32 @@
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.iml
+
+# Ignore build and generated files
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Ignore example node_modules
+example/ios/node_modules/
+
+# Ignore version control
+.git/
+.gitignore
+
+# Ignore scripts
+scripts/
+*.sh
+
+# Ignore Codemagic config from the pub package archive
+codemagic.yaml
+
+# Ignore test files
+test/
+
+# Ignore example app
+example/
+
+# Do not add `*.md` here: pub.dev requires README.md and CHANGELOG.md in the archive.

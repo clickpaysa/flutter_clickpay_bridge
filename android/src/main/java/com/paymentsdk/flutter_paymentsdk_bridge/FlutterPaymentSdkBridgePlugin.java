@@ -81,7 +81,7 @@ public class FlutterPaymentSdkBridgePlugin implements FlutterPlugin, MethodCallH
     private Map<String, Object> getMetadata() {
         Map<String, Object> metadata = new HashMap<>();
         metadata.put("PaymentSDKPluginName", "flutter");
-        metadata.put("PaymentSDKPluginVersion", "2.4.4");
+        metadata.put("PaymentSDKPluginVersion", "2.4.6");
         return metadata;
     }
 

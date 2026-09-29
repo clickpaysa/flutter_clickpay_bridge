@@ -1,0 +1,176 @@
+workflows:
+  publish-to-pubdev:
+    name: Bump Version, Update Changelog and Publish to pub.dev
+    max_build_duration: 45
+    environment:
+      groups:
+        - pub_credentials
+        - git
+      flutter: stable
+    scripts:
+      - name: Setup git credentials
+        script: |
+          git config --global user.email "$Git_Mail"
+          git config --global user.name "$Git_User"
+
+          # Setup git remote with credentials ONCE
+          REPO_URL=$(git config --get remote.origin.url)
+          # Robustly extract path handling SSH, HTTPS, and HTTPS+User formats
+          REPO_PATH=$(echo "$REPO_URL" | sed -e 's|.*github.com[:/]||' -e 's|\.git$||')
+          git remote set-url origin "https://${GIT_CREDENTIALS}@github.com/${REPO_PATH}.git"
+          echo "✓ Git remote configured for https://github.com/${REPO_PATH}.git"
+
+      - name: Read current version
+        script: |
+          CURRENT_VERSION=$(grep "^version:" pubspec.yaml | sed 's/version: //')
+          echo "Current version: $CURRENT_VERSION"
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $CM_ENV
+
+      - name: Bump version
+        script: |
+          CURRENT_VERSION=$CURRENT_VERSION
+          # Increment patch version (e.g., 2.4.5 -> 2.4.6)
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+
+          echo "Bumping version from $CURRENT_VERSION to $NEW_VERSION"
+          echo "NEW_VERSION=$NEW_VERSION" >> $CM_ENV
+
+          # Update pubspec.yaml (escape special chars and use portable sed)
+          sed -i.bak "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" pubspec.yaml
+          rm -f pubspec.yaml.bak
+
+      - name: Update CHANGELOG with bug fix
+        script: |
+          NEW_VERSION=$NEW_VERSION
+          echo "Updating CHANGELOG for version $NEW_VERSION"
+
+          if grep -q "^## $NEW_VERSION$" CHANGELOG.md; then
+            echo "CHANGELOG already has entry for $NEW_VERSION - skipping auto prepend"
+            head -10 CHANGELOG.md
+          else
+            {
+              echo "## $NEW_VERSION"
+              echo ""
+              echo "* Bug Fix"
+              echo ""
+            } > /tmp/changelog_entry.txt
+
+            cat /tmp/changelog_entry.txt CHANGELOG.md > CHANGELOG.md.new
+            mv CHANGELOG.md.new CHANGELOG.md
+            rm /tmp/changelog_entry.txt
+
+            echo "CHANGELOG updated successfully"
+            echo "First 10 lines of CHANGELOG:"
+            head -10 CHANGELOG.md
+          fi
+
+      - name: Push bumped version to build branch
+        script: |
+          NEW_VERSION=$NEW_VERSION
+          BUILD_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo "Current build branch: $BUILD_BRANCH"
+          echo "Pushing bumped version to $BUILD_BRANCH..."
+
+          git add pubspec.yaml CHANGELOG.md
+          git commit -m "Bump version to $NEW_VERSION and update CHANGELOG"
+
+          # Push with proper authentication
+          git push origin "$BUILD_BRANCH"
+          echo "✓ Successfully pushed to $BUILD_BRANCH"
+
+      - name: Create release branch
+        script: |
+          NEW_VERSION=$NEW_VERSION
+          echo "Creating release branch: release_$NEW_VERSION"
+
+          git checkout -b "release_$NEW_VERSION"
+          git add pubspec.yaml CHANGELOG.md
+          git commit -m "Bump version to $NEW_VERSION and update CHANGELOG" || true
+
+          # Push with proper authentication
+          echo "Pushing release branch to GitHub..."
+          git push -u origin "release_$NEW_VERSION"
+          echo "✓ Successfully pushed release_$NEW_VERSION branch"
+
+      - name: Create and push git tag
+        script: |
+          NEW_VERSION=$NEW_VERSION
+          echo "Creating tag: v$NEW_VERSION"
+
+          git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION"
+
+          # Push tag with authentication
+          echo "Pushing tag to GitHub..."
+          git push origin "v$NEW_VERSION"
+          echo "✓ Successfully pushed tag v$NEW_VERSION"
+
+      - name: Get Flutter dependencies
+        script: |
+          flutter pub get
+
+      - name: Setup pub credentials
+        script: |
+          mkdir -p "$HOME/Library/Application Support/dart"
+
+          # Debug: Check the environment variable
+          echo "DEBUG: Checking PUB_DEV_CREDENTIALS variable..."
+          echo "Variable length: ${#PUB_DEV_CREDENTIALS} characters"
+
+          if [ -z "$PUB_DEV_CREDENTIALS" ]; then
+            echo "❌ ERROR: PUB_DEV_CREDENTIALS environment variable is empty or not set!"
+            echo "Available env vars with 'PUB' in name:"
+            env | grep -i pub || echo "  (none found)"
+            exit 1
+          fi
+
+          # Write credentials file
+          echo "$PUB_DEV_CREDENTIALS" > "$HOME/Library/Application Support/dart/pub-credentials.json"
+
+          # Verify the file was written correctly
+          CREDS_FILE="$HOME/Library/Application Support/dart/pub-credentials.json"
+          echo "Checking credentials file: $CREDS_FILE"
+
+          if [ ! -f "$CREDS_FILE" ]; then
+            echo "❌ ERROR: Credentials file not found at $CREDS_FILE"
+            exit 1
+          fi
+
+          FILE_SIZE=$(wc -c < "$CREDS_FILE")
+          echo "✓ Credentials file exists"
+          echo "✓ File size: $FILE_SIZE bytes"
+
+          if [ "$FILE_SIZE" -lt 50 ]; then
+            echo "❌ ERROR: Credentials file is too small ($FILE_SIZE bytes). Expected valid JSON credentials."
+            exit 1
+          fi
+
+          # Verify it's valid JSON
+          if ! grep -q '"' "$CREDS_FILE"; then
+            echo "❌ ERROR: Credentials file doesn't contain valid JSON"
+            exit 1
+          fi
+
+          echo "✓ Credentials file appears valid"
+
+      - name: Publish to pub.dev
+        script: |
+          CREDS_FILE="$HOME/Library/Application Support/dart/pub-credentials.json"
+
+          # Final validation before publishing
+          if [ ! -f "$CREDS_FILE" ]; then
+            echo "❌ FATAL: Credentials file missing before publish!"
+            exit 1
+          fi
+
+          echo "✓ Starting pub.dev publish with credentials from: $CREDS_FILE"
+          flutter pub publish --dry-run
+          flutter pub publish -f
+    publishing:
+      email:
+        recipients:
+          - mobile.devop@paytabs.com
+        notify:
+          success: true
+          failure: true
